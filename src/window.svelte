@@ -7,7 +7,6 @@
 	export let name, w, h
 
 	$: size = [(width * w) / 1920, (height * h) / 920]
-	$: out = [Math.abs($coords.x) - Math.ceil((width - size[0]) / 2), Math.abs($coords.y) - Math.ceil((height - size[1]) / 2)]
 
 	const coords = spring({ x: 0, y: 0 }, {
 		stiffness: 0.2,
@@ -26,6 +25,8 @@
 	}
 
 	function checkOverflow() {
+		let out = [Math.abs($coords.x) - Math.ceil((width - size[0]) / 2), Math.abs($coords.y) - Math.ceil((height - size[1]) / 2)]
+
 		if (out[0] > 0) {
 			if ($coords.x > 0) {
 				if (out[1] > 0) {

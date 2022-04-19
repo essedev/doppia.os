@@ -11,7 +11,9 @@ export function pannable(node) {
 		}));
 
 		window.addEventListener('mousemove', handleMousemove);
+		window.addEventListener('touchmove', handleMousemove);
 		window.addEventListener('mouseup', handleMouseup);
+		window.addEventListener('touchup', handleMouseup);
 	}
 
 	function handleMousemove(event) {
@@ -33,15 +35,21 @@ export function pannable(node) {
 			detail: { x, y }
 		}));
 
-		window.removeEventListener('mousemove', handleMousemove);
-		window.removeEventListener('mouseup', handleMouseup);
+		window.addEventListener('mousemove', handleMousemove);
+		window.addEventListener('touchmove', handleMousemove);
+		window.addEventListener('mouseup', handleMouseup);
+		window.addEventListener('touchup', handleMouseup);
 	}
 
 	node.addEventListener('mousedown', handleMousedown);
+	node.addEventListener('touchdown', handleMousedown);
+
 
 	return {
 		destroy() {
 			node.removeEventListener('mousedown', handleMousedown);
+			node.addEventListener('touchdown', handleMousedown);
+
 		}
 	};
 }
