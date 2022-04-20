@@ -78,7 +78,7 @@
 		<span class="name">{name}</span>
 	</div>
 	<div class="content">
-		<iframe src="https://doppiaesse.github.io/" title="Curriculum">
+		<iframe src="https://doppiaesse.github.io/" title="Curriculum" frameborder=0>
 		</iframe>
 	</div>
 </div>
@@ -103,10 +103,17 @@
 		cursor: grab;
 		display: flex;
     	align-items: center;
+		position: relative;
 	}
 
 	.head:active {
 		cursor: grabbing;
+	}
+
+	iframe {
+		width: var(--width);
+		height: calc((var(--height) / 11 * 10) + 1px);
+		border-radius: 0px 0px 6px 6px;
 	}
 
 	.name {
