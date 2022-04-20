@@ -1,6 +1,8 @@
 <script>
 	import { spring } from 'svelte/motion'
 	import { pannable } from './pannable.js'
+	import mapTouchToMouseFor from 'svelte-touch-to-mouse'
+  	mapTouchToMouseFor('.head')
 
 	let width, height
 	$: width, height && checkOverflow()
