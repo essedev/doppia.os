@@ -2,7 +2,7 @@
 	import { spring } from 'svelte/motion'
 	import { pannable } from './pannable.js'
 	import mapTouchToMouseFor from 'svelte-touch-to-mouse'
-  	mapTouchToMouseFor('.head')
+  	mapTouchToMouseFor('.box')
 
 	let width, height
 	$: width, height && checkOverflow()
@@ -76,6 +76,10 @@
 <div class="box" style="--width: {size[0]}px; --height: {size[1]}px; transform: translate({$coords.x}px,{$coords.y}px)">
 	<div class="head" use:pannable on:panstart={handlePanStart} on:panmove={handlePanMove} on:panend={handlePanEnd}>
 		<span class="name">{name}</span>
+	</div>
+	<div class="content">
+		<iframe src="https://doppiaesse.github.io/" title="Curriculum">
+		</iframe>
 	</div>
 </div>
 
