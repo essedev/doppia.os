@@ -2,7 +2,9 @@
     import Window from './window.svelte';
 </script>
 
-<Window name='Window' w=650 h=400/>
+<div style="display: block; position:relative; width: 100%; height: 100%;">
+	<Window name='Window' w=650 h=400/>
+</div>
 
 <style>
 	:global(body) {
