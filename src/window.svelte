@@ -101,7 +101,9 @@
 	<div class="head">
 		<span class="name">{name}</span>
 	</div>
-	<div class="content" />
+	<div class="content">
+		test
+	</div>
 </div>
 
 <style>
@@ -137,6 +139,16 @@
 		left: calc(var(--width) / 70);
 		font-size: calc(var(--height) / 23);
 		margin-bottom: calc(var(--height) / 200);
+	}
+
+	.content {
+		height: calc(var(--height) / 1.1);
+		border-radius: 0px 0px 6px 6px;
+		user-select: none;
+		cursor: grab;
+		display: flex;
+		align-items: center;
+		position: relative;
 	}
 
 	:global([draggable]) {

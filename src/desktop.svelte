@@ -1,14 +1,19 @@
 <script>
-    import Window from './window.svelte';
+	import Window from "./window.svelte";
 </script>
 
-<div style="display: block; position:relative; width: 100%; height: 100%;">
-	<Window name='Window' w=650 h=400/>
-</div>
+<Window name="Window" w="650" h="400" />
 
 <style>
-	:global(body) {
+	:global(html, body) {
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
 		overflow: hidden;
+	}
+	
+	:global(body) {
 		background-color: #048282;
 	}
 </style>
