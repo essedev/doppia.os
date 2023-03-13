@@ -1,8 +1,8 @@
 <script>
-	import Window from "./window.svelte";
+    import Window from './window.svelte';
 </script>
 
-<Window name="Window" w="650" h="400" />
+<Window name='Window' w=650 h=400/>
 
 <style>
 	:global(html, body) {
@@ -11,9 +11,6 @@
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
-	}
-	
-	:global(body) {
 		background-color: #048282;
 	}
 </style>

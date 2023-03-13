@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "sirv-cli": "^2.0.0",
-    "svelte-drag-and-drop-actions": "^1.0.0",
-    "svelte-drag-drop-touch": "^0.1.9"
+    "svelte-touch-to-mouse": "^1.0.0"
   }
 }
