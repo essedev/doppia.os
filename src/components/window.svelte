@@ -1,6 +1,6 @@
 <script>
 	import { spring } from 'svelte/motion'
-	import { pannable } from './pannable.js'
+	import { pannable } from '../../scripts/pannable.js'
 
 	let width, height
 	$: width, height && checkOverflow()
@@ -27,26 +27,27 @@
 	function checkOverflow() {
 		let out = [Math.abs($coords.x) - Math.ceil((width - size[0]) / 2), Math.abs($coords.y) - Math.ceil((height - size[1]) / 2)]
 
+		// 50 is the height of the navbar, 1 is the added margin
 		if (out[0] > 0) {
 			if ($coords.x > 0) {
 				if (out[1] > 0) {
 					if ($coords.y > 0) {
-						coords.set({ x: $coords.x - out[0], y: $coords.y - out[1] })
+						coords.set({ x: $coords.x - out[0] - 1, y: $coords.y - out[1] - 51 })
 					} else {
-						coords.set({ x: $coords.x - out[0], y: $coords.y + out[1] })
+						coords.set({ x: $coords.x - out[0] - 1, y: $coords.y + out[1] + 1 })
 					}
 				} else {
-					coords.set({ x: $coords.x - out[0], y: $coords.y })
+					coords.set({ x: $coords.x - out[0] - 1, y: $coords.y })
 				}
 			} else {
 				if (out[1] > 0) {
 					if ($coords.y > 0) {
-						coords.set({ x: $coords.x + out[0], y: $coords.y - out[1] })
+						coords.set({ x: $coords.x + out[0] + 1, y: $coords.y - out[1] - 51 })
 					} else {
-						coords.set({ x: $coords.x + out[0], y: $coords.y + out[1] })
+						coords.set({ x: $coords.x + out[0] + 1, y: $coords.y + out[1] + 1 })
 					}
 				} else {
-					coords.set({ x: $coords.x + out[0], y: $coords.y })
+					coords.set({ x: $coords.x + out[0] + 1, y: $coords.y })
 				}
 			}
 		}
@@ -54,9 +55,9 @@
 		if (out[1] > 0) {
 			if (out[0] < 0) {
 				if ($coords.y > 0) {
-					coords.set({ x: $coords.x, y: $coords.y - out[1] })
+					coords.set({ x: $coords.x, y: $coords.y - out[1] - 51 })
 				} else {
-					coords.set({ x: $coords.x, y: $coords.y + out[1] })
+					coords.set({ x: $coords.x, y: $coords.y + out[1] + 1 })
 				}
 			}
 		}
