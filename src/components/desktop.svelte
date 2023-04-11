@@ -5,6 +5,10 @@
 	import 'boxicons'
 </script>
 
+<svelte:head>
+    <title>doppia.os</title> 
+</svelte:head>
+
 <Navbar />
 <div class="view">
 	<ForkMe />
