@@ -1,12 +1,12 @@
 <script>
+	import "boxicons";
 	import Window from "./window.svelte";
 	import ForkMe from "./forkme.svelte";
 	import Navbar from "./navbar.svelte";
-	import 'boxicons'
 </script>
 
 <svelte:head>
-    <title>doppia.os</title> 
+	<title>doppia.os</title>
 </svelte:head>
 
 <Navbar />

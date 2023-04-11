@@ -50,7 +50,7 @@
 	.topnav span {
 		float: left;
 		text-align: center;
-		padding: 17px 10px 12px 10px;
+		padding: 15px 10px 10px 10px;
 		text-decoration: none;
 		font-size: 18px;
 	}
@@ -58,12 +58,12 @@
 	/* Style the fullscreen button */
 	.fullscreenBtn {
 		margin-left: auto;
-		padding: 17px 16px 12px 16px !important;
+		padding: 15px 16px 10px 16px !important;
 	}
 
 	/* Style the menu button */
 	.menuBtn {
-		padding: 17px 8px 12px 16px !important;
+		padding: 15px 8px 10px 16px !important;
 	}
 
 	.topnav button {
@@ -72,5 +72,9 @@
 		margin: 0;
 		padding: 0;
 		cursor: pointer;
+	}
+
+	box-icon {
+		fill: #333333;
 	}
 </style>
