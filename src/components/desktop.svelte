@@ -1,7 +1,8 @@
 <script>
 	import Window from "./window.svelte";
-	import ForkMe from "./fork-me.svelte";
+	import ForkMe from "./forkme.svelte";
 	import Navbar from "./navbar.svelte";
+	import 'boxicons'
 </script>
 
 <Navbar />
