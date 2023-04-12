@@ -3,14 +3,25 @@
 	import Window from "./window.svelte";
 	import ForkMe from "./forkme.svelte";
 	import Navbar from "./navbar.svelte";
-	import Fathom from "./fathom.svelte";
+	import { onMount } from "svelte";
+	import { browser } from "$app/environment";
+	import { page } from "$app/stores";
+	import * as Fathom from "fathom-client";
+
+	onMount(() => {
+		Fathom.load("YEGXYCZY", {
+			// optional - add your website domain(s) to avoid views during development
+			includedDomains: ['doppiaesse.tech', 'www.doppiaesse.tech']
+		});
+	});
+
+	// track a page view when the pathname changes
+	$: $page.url.pathname, browser && Fathom.trackPageview();
 </script>
 
 <svelte:head>
 	<title>doppia.os</title>
 </svelte:head>
-
-<Fathom />
 
 <Navbar />
 <div class="view">

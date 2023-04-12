@@ -19,6 +19,7 @@
 	},
 	"dependencies": {
 		"boxicons": "^2.1.4",
+		"fathom-client": "^3.5.0",
 		"sirv-cli": "^2.0.0"
 	}
 }
