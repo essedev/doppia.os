@@ -7,6 +7,8 @@
 	export let name, w, h;
 
 	$: size = [(width * w) / 1920, (height * h) / 920];
+	// Min window width is 300px
+	$: size[0] = Math.max(300, size[0]);
 
 	const coords = spring(
 		{ x: 0, y: 0 },
