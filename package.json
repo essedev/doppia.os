@@ -1,25 +1,24 @@
 {
-	"name": "svelte-app",
-	"version": "1.0.0",
+	"name": "doppia.os",
+	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"build": "rollup -c",
-		"dev": "rollup -c -w",
-		"start": "sirv public --no-clear"
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"lint": "prettier --plugin-search-dir . --check .",
+		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@rollup/plugin-commonjs": "^17.0.0",
-		"@rollup/plugin-node-resolve": "^11.0.0",
-		"rollup": "^2.3.4",
-		"rollup-plugin-css-only": "^3.1.0",
-		"rollup-plugin-livereload": "^2.0.0",
-		"rollup-plugin-svelte": "^7.0.0",
-		"rollup-plugin-terser": "^7.0.0",
-		"svelte": "^3.0.0"
+		"@sveltejs/adapter-auto": "^2.0.0",
+		"@sveltejs/kit": "^1.5.0",
+		"prettier": "^2.8.0",
+		"prettier-plugin-svelte": "^2.8.1",
+		"svelte": "^3.54.0",
+		"vite": "^4.2.0"
 	},
+	"type": "module",
 	"dependencies": {
-		"boxicons": "^2.1.4",
-		"fathom-client": "^3.5.0",
-		"sirv-cli": "^2.0.0"
+		"fathom-client": "^3.5.0"
 	}
 }

@@ -2,16 +2,13 @@
 	function fullscreenToggle() {
 		if (!document.fullscreenElement) {
 			document.documentElement.requestFullscreen();
-			document.getElementById("fullscreenIcon").style.display = "none";
-			document.getElementById("exitFullscreenIcon").style.display =
-				"block";
+			document.getElementById('fullscreenIcon').style.display = 'none';
+			document.getElementById('exitFullscreenIcon').style.display = 'block';
 		} else {
 			if (document.exitFullscreen) {
 				document.exitFullscreen();
-				document.getElementById("fullscreenIcon").style.display =
-					"block";
-				document.getElementById("exitFullscreenIcon").style.display =
-					"none";
+				document.getElementById('fullscreenIcon').style.display = 'block';
+				document.getElementById('exitFullscreenIcon').style.display = 'none';
 			}
 		}
 	}
@@ -21,17 +18,14 @@
 	<span class="menuBtn">
 		<box-icon name="grid-alt" />
 	</span>
-	<span>Home</span>
-	<span>About</span>
-	<span>Projects</span>
-	<span>Contact</span>
+	<button class="link-btn">Home</button>
+	<button class="link-btn">About</button>
+	<button class="link-btn">Projects</button>
+	<button class="link-btn">Contact</button>
 	<span class="fullscreenBtn">
 		<button class="no-btn" on:click={fullscreenToggle}>
 			<box-icon id="fullscreenIcon" name="fullscreen" />
-			<box-icon
-				id="exitFullscreenIcon"
-				name="exit-fullscreen"
-				style="display: none;" />
+			<box-icon id="exitFullscreenIcon" name="exit-fullscreen" style="display: none;" />
 		</button>
 	</span>
 </div>
@@ -41,8 +35,7 @@
 	.topnav {
 		background-color: #eeeeee;
 		overflow: hidden;
-		box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px,
-			rgba(0, 0, 0, 0.24) 0px 1px 2px;
+		box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
 		display: flex;
 	}
 
@@ -72,6 +65,14 @@
 		margin: 0;
 		padding: 0;
 		cursor: pointer;
+		outline: none;
+	}
+
+	.link-btn {
+		margin: 10px !important;
+		font-size: 18px;
+		text-align: center;
+		font-family: monospace;
 	}
 
 	box-icon {

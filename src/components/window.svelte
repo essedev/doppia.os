@@ -1,6 +1,6 @@
 <script>
-	import { spring } from "svelte/motion";
-	import { pannable } from "../../scripts/pannable.js";
+	import { spring } from 'svelte/motion';
+	import { pannable } from '../scripts/pannable.js';
 
 	let width, height;
 	$: width, height && checkOverflow();
@@ -12,7 +12,7 @@
 		{ x: 0, y: 0 },
 		{
 			stiffness: 0.2,
-			damping: 0.4,
+			damping: 0.4
 		}
 	);
 
@@ -23,14 +23,14 @@
 	function handlePanMove(event) {
 		coords.update(($coords) => ({
 			x: $coords.x + event.detail.dx,
-			y: $coords.y + event.detail.dy,
+			y: $coords.y + event.detail.dy
 		}));
 	}
 
 	function checkOverflow() {
 		let out = [
 			Math.abs($coords.x) - Math.ceil((width - size[0]) / 2),
-			Math.abs($coords.y) - Math.ceil((height - size[1]) / 2),
+			Math.abs($coords.y) - Math.ceil((height - size[1]) / 2)
 		];
 
 		// 50 is the height of the navbar, 1 is the added margin
@@ -43,18 +43,18 @@
 					if ($coords.y > 0) {
 						coords.set({
 							x: $coords.x - out[0] - offset,
-							y: $coords.y - out[1] - offsetNav,
+							y: $coords.y - out[1] - offsetNav
 						});
 					} else {
 						coords.set({
 							x: $coords.x - out[0] - offset,
-							y: $coords.y + out[1] + offset,
+							y: $coords.y + out[1] + offset
 						});
 					}
 				} else {
 					coords.set({
 						x: $coords.x - out[0] - offset,
-						y: $coords.y,
+						y: $coords.y
 					});
 				}
 			} else {
@@ -62,18 +62,18 @@
 					if ($coords.y > 0) {
 						coords.set({
 							x: $coords.x + out[0] + offset,
-							y: $coords.y - out[1] - offsetNav,
+							y: $coords.y - out[1] - offsetNav
 						});
 					} else {
 						coords.set({
 							x: $coords.x + out[0] + offset,
-							y: $coords.y + out[1] + offset,
+							y: $coords.y + out[1] + offset
 						});
 					}
 				} else {
 					coords.set({
 						x: $coords.x + out[0] + offset,
-						y: $coords.y,
+						y: $coords.y
 					});
 				}
 			}
@@ -84,7 +84,7 @@
 				if ($coords.y > 0) {
 					coords.set({
 						x: $coords.x,
-						y: $coords.y - out[1] - offsetNav,
+						y: $coords.y - out[1] - offsetNav
 					});
 				} else {
 					coords.set({ x: $coords.x, y: $coords.y + out[1] + 10 });
@@ -104,16 +104,21 @@
 
 <div
 	class="box"
-	style="--width: {size[0]}px; --height: {size[1]}px; transform: translate({$coords.x}px,{$coords.y}px)">
+	style="--width: {size[0]}px; --height: {size[1]}px; transform: translate({$coords.x}px,{$coords.y}px)"
+>
 	<div
 		class="head"
 		use:pannable
 		on:panstart={handlePanStart}
 		on:panmove={handlePanMove}
-		on:panend={handlePanEnd}>
+		on:panend={handlePanEnd}
+	>
 		<span class="name">{name}</span>
 	</div>
-	<div class="content" />
+	<div class="content">
+		doppiaesse.tech<br /><br />
+		Follow me on <a href="https://twitter.com/doppiaesse404" target="_blank">Twitter</a> for updates
+	</div>
 </div>
 
 <style>
@@ -121,8 +126,7 @@
 		position: absolute;
 		width: var(--width);
 		height: var(--height);
-		box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px,
-			rgba(0, 0, 0, 0.24) 0px 1px 2px;
+		box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
 		left: calc(50% - var(--width) / 2);
 		top: calc(50% - var(--height) / 2);
 		border-radius: 6px;
@@ -153,5 +157,10 @@
 		left: calc(var(--width) / 70);
 		font-size: calc(var(--height) / 23);
 		margin-bottom: calc(var(--height) / 200);
+	}
+
+	.content {
+		padding: 15px;
+		font-size: 15px;
 	}
 </style>
