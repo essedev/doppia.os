@@ -5,6 +5,10 @@
 	import Navbar from "./navbar.svelte";
 </script>
 
+<!-- Fathom - beautiful, simple website analytics -->
+<script src="https://cdn.usefathom.com/script.js" data-site="MFBUURDK" defer></script>
+<!-- / Fathom -->
+
 <svelte:head>
 	<title>doppia.os</title>
 </svelte:head>
