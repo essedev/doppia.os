@@ -1,0 +1,7 @@
+<!-- Fathom - beautiful, simple website analytics -->
+<script
+	src="https://cdn.usefathom.com/script.js"
+	data-site="MFBUURDK"
+	defer></script>
+
+<!-- / Fathom -->

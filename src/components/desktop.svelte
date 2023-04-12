@@ -3,15 +3,14 @@
 	import Window from "./window.svelte";
 	import ForkMe from "./forkme.svelte";
 	import Navbar from "./navbar.svelte";
+	import Fathom from "./fathom.svelte";
 </script>
-
-<!-- Fathom - beautiful, simple website analytics -->
-<script src="https://cdn.usefathom.com/script.js" data-site="MFBUURDK" defer></script>
-<!-- / Fathom -->
 
 <svelte:head>
 	<title>doppia.os</title>
 </svelte:head>
+
+<Fathom />
 
 <Navbar />
 <div class="view">
