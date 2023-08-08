@@ -22,7 +22,7 @@ const windows: window[] = [
 		w: 650,
 		h: 400,
 		x: 10,
-		y: 10,
+		y: 60,
 		active: true
 	},
 	{

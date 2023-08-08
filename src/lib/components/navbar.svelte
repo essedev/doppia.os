@@ -38,71 +38,63 @@
 </script>
 
 <div class="navbar">
-	<div class="navmenu">
-		<button class="menuBtn">
-			<box-icon name="grid-alt" />
-		</button>
+	<button class="menuBtn">
+		<box-icon name="grid-alt" />
+	</button>
 
-		<button
-			id="wip"
-			class="link-btn active"
-			on:click={() => activateWindow("wip")}>
-			Home
-		</button>
-		<button
-			id="about"
-			class="link-btn"
-			on:click={() => activateWindow("about")}>
-			About
-		</button>
-		<button class="link-btn">Projects</button>
-		<button class="link-btn">Contact</button>
+	<button
+		id="wip"
+		class="link-btn active"
+		on:click={() => activateWindow("wip")}>
+		Home
+	</button>
+	<button
+		id="about"
+		class="link-btn"
+		on:click={() => activateWindow("about")}>
+		About
+	</button>
+	<button class="link-btn">Projects</button>
+	<button class="link-btn">Contact</button>
 
-		<button class="fullscreenBtn" on:click={fullscreenToggle}>
-			<box-icon id="fullscreenIcon" name="fullscreen" />
-			<box-icon
-				id="exitFullscreenIcon"
-				name="exit-fullscreen"
-				style="display: none;" />
-		</button>
-	</div>
+	<button class="fullscreenBtn" on:click={fullscreenToggle}>
+		<box-icon id="fullscreenIcon" name="fullscreen" />
+		<box-icon
+			id="exitFullscreenIcon"
+			name="exit-fullscreen"
+			style="display: none;" />
+	</button>
 </div>
 
 <style>
 	.navbar {
 		position: fixed;
-		top: 0;
-		left: 0;
 		width: 100%;
-		z-index: 1;
-	}
-
-	.navmenu {
+		z-index: 11;
 		display: flex;
 		background-color: #eeeeee;
 		overflow: hidden;
 		border-bottom: 1px solid #cccccc;
 	}
 
-	.navmenu button {
-		background-color: transparent;
-		border: none;
+	.navbar button {
 		cursor: pointer;
 		outline: none;
 		padding: 0;
+		border: none;
+		cursor: pointer;
 	}
 
 	.active {
-		margin-top: 2px !important;
+		margin-top: 2px;
 		background-color: #dddddda1 !important;
-		border-bottom: 2px solid #1c1c1cc0 !important;
+		border-bottom: 2px solid #333333 !important;
 	}
 
 	.link-btn {
 		margin-left: 10px;
 		padding: 0 10px 0 10px !important;
 		font-size: 18px;
-		text-align: center;
 	}
 
 	/* Style the fullscreen button */

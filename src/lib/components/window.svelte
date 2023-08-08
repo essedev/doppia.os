@@ -95,7 +95,7 @@
 	}
 
 	onMount(() => {
-		coords.set({ x: posX, y: posY + 50 }, { hard: true })
+		coords.set({ x: posX, y: posY }, { hard: true })
 	})
 </script>
 
