@@ -1,5 +1,5 @@
 <a
-	href="https://github.com/doppiaesse/Svelte98"
+	href="https://github.com/doppiaesse/doppia.os"
 	target="_blank"
 	class="github-corner"
 	aria-label="View source on GitHub">
