@@ -19,7 +19,7 @@
 	$: width, height && setTimeout(checkOverflow, 300)
 
 	// Calculate the size of the window
-	$: size = [(width * w) / 1600, (height * h) / 900]
+	$: size = [(width * w) / 1900, (height * h) / 900]
 
 	// Min window width is 300px
 	$: size[0] = Math.max(300, size[0])

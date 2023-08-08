@@ -10,19 +10,30 @@
 	<title>doppia.os</title>
 </svelte:head>
 
-<Navbar />
+<div class="view">
+	<Navbar />
 
-<Forkme />
+	<Forkme />
 
-{#each $windowsStore as window}
-	{#if window.active}
-		<Window
-			id={window.id}
-			name={window.name}
-			content={window.content}
-			w={window.w}
-			h={window.h}
-			posX={window.x}
-			posY={window.y} />
-	{/if}
-{/each}
+	{#each $windowsStore as window}
+		{#if window.active}
+			<Window
+				id={window.id}
+				name={window.name}
+				content={window.content}
+				w={window.w}
+				h={window.h}
+				posX={window.x}
+				posY={window.y} />
+		{/if}
+	{/each}
+</div>
+
+<style>
+	.view {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+	}
+</style>
