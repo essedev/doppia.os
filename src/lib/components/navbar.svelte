@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { windows } from "$lib/utils/stores"
+	import { windowsStore } from "$lib/utils/stores"
 
 	function fullscreenToggle() {
 		const fullscreenElement = document.fullscreenElement as HTMLElement
@@ -24,7 +24,7 @@
 	}
 
 	function activateWindow(id: string) {
-		windows.update((windows) => {
+		windowsStore.update((windows) => {
 			return windows.map((window) => {
 				if (window.id === id) {
 					return { ...window, active: !window.active }
@@ -32,39 +32,59 @@
 				return window
 			})
 		})
+
+		document.getElementById(id)?.classList.toggle("active")
 	}
 </script>
 
-<div class="topnav">
-	<button class="menuBtn">
-		<box-icon name="grid-alt" />
-	</button>
+<div class="navbar">
+	<div class="navmenu">
+		<button class="menuBtn">
+			<box-icon name="grid-alt" />
+		</button>
 
-	<button class="link-btn" on:click={() => activateWindow("wip")}
-		>Home</button>
-	<button class="link-btn" on:click={() => activateWindow("about")}
-		>About</button>
-	<button class="link-btn">Projects</button>
-	<button class="link-btn">Contact</button>
+		<button
+			id="wip"
+			class="link-btn active"
+			on:click={() => activateWindow("wip")}>
+			Home
+		</button>
+		<button
+			id="about"
+			class="link-btn"
+			on:click={() => activateWindow("about")}>
+			About
+		</button>
+		<button class="link-btn">Projects</button>
+		<button class="link-btn">Contact</button>
 
-	<button class="fullscreenBtn" on:click={fullscreenToggle}>
-		<box-icon id="fullscreenIcon" name="fullscreen" />
-		<box-icon
-			id="exitFullscreenIcon"
-			name="exit-fullscreen"
-			style="display: none;" />
-	</button>
+		<button class="fullscreenBtn" on:click={fullscreenToggle}>
+			<box-icon id="fullscreenIcon" name="fullscreen" />
+			<box-icon
+				id="exitFullscreenIcon"
+				name="exit-fullscreen"
+				style="display: none;" />
+		</button>
+	</div>
 </div>
 
 <style>
-	.topnav {
+	.navbar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		z-index: 1;
+	}
+
+	.navmenu {
+		display: flex;
 		background-color: #eeeeee;
 		overflow: hidden;
 		border-bottom: 1px solid #cccccc;
-		display: flex;
 	}
 
-	.topnav button {
+	.navmenu button {
 		background-color: transparent;
 		border: none;
 		cursor: pointer;
@@ -72,21 +92,27 @@
 		padding: 0;
 	}
 
+	.active {
+		margin-top: 2px !important;
+		background-color: #dddddda1 !important;
+		border-bottom: 2px solid #1c1c1cc0 !important;
+	}
+
 	.link-btn {
-		margin-left: 16px;
-		padding: 0 6px 0 6px !important;
+		margin-left: 10px;
+		padding: 0 10px 0 10px !important;
 		font-size: 18px;
 		text-align: center;
 	}
 
 	/* Style the fullscreen button */
 	.fullscreenBtn {
-		margin: 11px 16px 10px auto;
+		margin: 12px 16px 9px auto;
 	}
 
 	/* Style the menu button */
 	.menuBtn {
-		margin: 14px 0 10px 16px;
+		margin: 14px 6px 10px 16px;
 	}
 
 	box-icon {

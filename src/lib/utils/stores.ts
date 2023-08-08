@@ -1,8 +1,20 @@
 import { writable } from "svelte/store"
+import type { SvelteComponent, ComponentType } from "svelte"
 import wip from "$lib/components/windows/wip.svelte"
 import about from "$lib/components/windows/about.svelte"
 
-export const windows = writable([
+type window = {
+	id: string
+	name: string
+	content: ComponentType<SvelteComponent>
+	w: number
+	h: number
+	x: number
+	y: number
+	active: boolean
+}
+
+const windows: window[] = [
 	{
 		id: "wip",
 		name: "WORK IN PROGRESS",
@@ -21,6 +33,8 @@ export const windows = writable([
 		h: 400,
 		x: 130,
 		y: 170,
-		active: true
+		active: false
 	}
-])
+]
+
+export const windowsStore = writable(windows)

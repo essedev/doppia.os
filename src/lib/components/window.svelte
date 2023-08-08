@@ -4,7 +4,7 @@
 	import { spring } from "svelte/motion"
 	import { fade } from "svelte/transition"
 	import { pannable } from "$lib/utils/pannable.js"
-	import { windows } from "$lib/utils/stores"
+	import { windowsStore } from "$lib/utils/stores"
 
 	export let id: string,
 		name: string,
@@ -19,13 +19,14 @@
 	$: width, height && setTimeout(checkOverflow, 300)
 
 	// Calculate the size of the window
-	$: size = [(width * w) / 1920, (height * h) / 920]
+	$: size = [(width * w) / 1600, (height * h) / 900]
 
 	// Min window width is 300px
 	$: size[0] = Math.max(300, size[0])
 	// Min window height is 200px
 	$: size[1] = Math.max(200, size[1])
 
+	// Create a spring for the window coordinates
 	const coords = spring(
 		{ x: 0, y: 0 },
 		{
@@ -38,34 +39,35 @@
 		let offset = 10
 		let navHeight = 50
 
-		// Calcola la posizione massima consentita per la finestra
+		// Calculate the maximum allowed position for the window
 		const maxX = width - size[0]
-		const maxY = height - size[1] - navHeight
+		const maxY = height - size[1]
 
-		// Controlla se la finestra è al di fuori dei bordi orizzontali
+		// Check if the window is outside the horizontal borders
 		let newX = $coords.x
 		if ($coords.x < 0) {
-			// Riporta la finestra all'inizio della finestra visibile
+			// Return the window to the start of the visible window
 			newX = 0 + offset
 		} else if ($coords.x > maxX) {
-			// Riporta la finestra alla fine della finestra visibile
+			// Return the window to the end of the visible window
 			newX = maxX - offset
 		}
 
-		// Controlla se la finestra è al di fuori dei bordi verticali
+		// Check if the window is outside the vertical borders
 		let newY = $coords.y
-		if ($coords.y < 0) {
-			// Riporta la finestra all'inizio della finestra visibile
-			newY = 0 + offset
+		if ($coords.y < 0 + navHeight) {
+			// Return the window to the start of the visible window
+			newY = 0 + offset + navHeight
 		} else if ($coords.y > maxY) {
-			// Riporta la finestra alla fine della finestra visibile
+			// Return the window to the end of the visible window
 			newY = maxY - offset
 		}
 
-		// Imposta le nuove coordinate della finestra
+		// Set the new window coordinates
 		coords.set({ x: newX, y: newY })
 
-		windows.update((windows) => {
+		// Update the coordinates of the window in the store
+		windowsStore.update((windows) => {
 			return windows.map((window) => {
 				if (window.id === id) {
 					return { ...window, x: newX, y: newY }
@@ -93,7 +95,7 @@
 	}
 
 	onMount(() => {
-		coords.set({ x: posX, y: posY }, { hard: true })
+		coords.set({ x: posX, y: posY + 50 }, { hard: true })
 	})
 </script>
 
