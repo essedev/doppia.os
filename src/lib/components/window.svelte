@@ -135,7 +135,7 @@
 		on:panstart={handlePanStart}
 		on:panmove={handlePanMove}
 		on:panend={handlePanEnd}>
-		<span class="name">{name} - {posZ}</span>
+		<span class="name">{name}</span>
 	</div>
 	<div class="content">
 		<svelte:component this={content} />
