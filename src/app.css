@@ -6,9 +6,9 @@ body {
 	height: 100%;
 	overflow: hidden;
 	background-color: #048282;
-	font-family: "Consolas";
+	font-family: "Arial";
 }
 
 button {
-	font-family: "Consolas";
+	font-family: "Arial";
 }

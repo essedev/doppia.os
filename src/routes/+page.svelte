@@ -47,7 +47,8 @@
 				w={window.w}
 				h={window.h}
 				posX={window.x}
-				posY={window.y} />
+				posY={window.y}
+				posZ={window.z} />
 		{/if}
 	{/each}
 </div>

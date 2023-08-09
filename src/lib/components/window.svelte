@@ -12,7 +12,8 @@
 		w: number,
 		h: number,
 		posX: number,
-		posY: number
+		posY: number,
+		posZ: number
 
 	let width: number, height: number
 
@@ -68,17 +69,37 @@
 
 		// Update the coordinates of the window in the store
 		windowsStore.update((windows) => {
-			return windows.map((window) => {
-				if (window.id === id) {
-					return { ...window, x: newX, y: newY }
+			const wIndex = windows.findIndex((window) => window.id === id)
+
+			windows[wIndex].x = newX
+			windows[wIndex].y = newY
+
+			return windows
+		})
+	}
+
+	function toFront() {
+		windowsStore.update((windows) => {
+			const activeWindows = windows.filter((window) => window.active)
+			const activeWindowCount = activeWindows.length
+
+			const wIndex = windows.findIndex((window) => window.id === id)
+
+			for (let i = 0; i < windows.length; i++) {
+				if (windows[i].z > windows[wIndex].z) {
+					windows[i].z -= 1
 				}
-				return window
-			})
+			}
+
+			windows[wIndex].z = activeWindowCount
+
+			return windows
 		})
 	}
 
 	function handlePanStart() {
 		coords.stiffness = coords.damping = 1
+		toFront()
 	}
 
 	function handlePanMove(event: { detail: { dx: number; dy: number } }) {
@@ -96,34 +117,43 @@
 
 	onMount(() => {
 		coords.set({ x: posX, y: posY }, { hard: true })
+		toFront()
 	})
 </script>
 
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} />
 
-<div
+<button
 	in:fade={{ duration: 30 }}
 	out:fade={{ duration: 30 }}
+	on:click={() => toFront()}
 	class="box"
-	style="--width: {size[0]}px; --height: {size[1]}px; transform: translate({$coords.x}px,{$coords.y}px)">
+	style="--width: {size[0]}px; --height: {size[1]}px; --posz: {posZ}; transform: translate({$coords.x}px,{$coords.y}px)">
 	<div
 		class="head"
 		use:pannable
 		on:panstart={handlePanStart}
 		on:panmove={handlePanMove}
 		on:panend={handlePanEnd}>
-		<span class="name">{name}</span>
+		<span class="name">{name} - {posZ}</span>
 	</div>
 	<div class="content">
 		<svelte:component this={content} />
 	</div>
-</div>
+</button>
 
 <style>
-	.box {
-		position: absolute;
+	button {
+		margin: 0;
+		padding: 0;
+		text-align: left;
 		width: var(--width);
 		height: var(--height);
+	}
+
+	.box {
+		z-index: var(--posz);
+		position: absolute;
 		border-radius: 6px;
 		background-color: #eeeeee;
 		border: 1px solid #cccccc;
@@ -152,5 +182,8 @@
 	.content {
 		padding: 15px;
 		font-size: 16px;
+		height: calc(100% - 72px);
+		overflow: scroll;
+		border-radius: 0px 0px 6px 6px;
 	}
 </style>

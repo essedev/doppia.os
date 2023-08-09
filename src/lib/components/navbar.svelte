@@ -3,34 +3,28 @@
 
 	function fullscreenToggle() {
 		const fullscreenElement = document.fullscreenElement as HTMLElement
+
 		const fullscreenIcon = document.getElementById(
 			"fullscreenIcon"
-		) as HTMLElement
-		const exitFullscreenIcon = document.getElementById(
-			"exitFullscreenIcon"
 		) as HTMLElement
 
 		if (!fullscreenElement) {
 			document.documentElement.requestFullscreen()
-			fullscreenIcon.style.display = "none"
-			exitFullscreenIcon.style.display = "block"
+			fullscreenIcon.setAttribute("name", "exit-fullscreen")
 		} else {
 			if (document.exitFullscreen) {
 				document.exitFullscreen()
-				fullscreenIcon.style.display = "block"
-				exitFullscreenIcon.style.display = "none"
+				fullscreenIcon.setAttribute("name", "fullscreen")
 			}
 		}
 	}
 
 	function activateWindow(id: string) {
 		windowsStore.update((windows) => {
-			return windows.map((window) => {
-				if (window.id === id) {
-					return { ...window, active: !window.active }
-				}
-				return window
-			})
+			const wIndex = windows.findIndex((window) => window.id === id)
+
+			windows[wIndex].active = !windows[wIndex].active
+			return windows
 		})
 
 		document.getElementById(id)?.classList.toggle("active")
@@ -54,15 +48,17 @@
 		on:click={() => activateWindow("about")}>
 		About
 	</button>
-	<button class="link-btn">Projects</button>
-	<button class="link-btn">Contact</button>
+	<button
+		id="projects"
+		class="link-btn"
+		on:click={() => activateWindow("projects")}>Projects</button>
+	<button
+		id="contact"
+		class="link-btn"
+		on:click={() => activateWindow("contact")}>Contact</button>
 
 	<button class="fullscreenBtn" on:click={fullscreenToggle}>
 		<box-icon id="fullscreenIcon" name="fullscreen" />
-		<box-icon
-			id="exitFullscreenIcon"
-			name="exit-fullscreen"
-			style="display: none;" />
 	</button>
 </div>
 
@@ -79,32 +75,34 @@
 
 	.navbar button {
 		cursor: pointer;
-		outline: none;
-		padding: 0;
 		border: none;
-		cursor: pointer;
 	}
 
 	.active {
 		margin-top: 2px;
-		background-color: #dddddda1 !important;
+		background-color: #dddddda1;
 		border-bottom: 2px solid #333333 !important;
 	}
 
 	.link-btn {
 		margin-left: 10px;
-		padding: 0 10px 0 10px !important;
+		padding: 0 10px 0 10px;
 		font-size: 18px;
 	}
 
 	/* Style the fullscreen button */
 	.fullscreenBtn {
-		margin: 12px 16px 9px auto;
+		margin-left: auto;
+		padding-inline: 14px;
+		padding-top: 13px;
+		padding-bottom: 9px;
 	}
 
 	/* Style the menu button */
 	.menuBtn {
-		margin: 14px 6px 10px 16px;
+		padding-inline: 14px;
+		padding-top: 13px;
+		padding-bottom: 9px;
 	}
 
 	box-icon {
