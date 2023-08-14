@@ -69,10 +69,10 @@
 
 		// Update the coordinates of the window in the store
 		windowsStore.update((windows) => {
-			const wIndex = windows.findIndex((window) => window.id === id)
+			const index = windows.findIndex((window) => window.id === id)
 
-			windows[wIndex].x = newX
-			windows[wIndex].y = newY
+			windows[index].x = newX
+			windows[index].y = newY
 
 			return windows
 		})
@@ -83,15 +83,15 @@
 			const activeWindows = windows.filter((window) => window.active)
 			const activeWindowCount = activeWindows.length
 
-			const wIndex = windows.findIndex((window) => window.id === id)
+			const index = windows.findIndex((window) => window.id === id)
 
 			for (let i = 0; i < windows.length; i++) {
-				if (windows[i].z > windows[wIndex].z) {
+				if (windows[i].z > windows[index].z) {
 					windows[i].z -= 1
 				}
 			}
 
-			windows[wIndex].z = activeWindowCount
+			windows[index].z = activeWindowCount
 
 			return windows
 		})
@@ -99,7 +99,6 @@
 
 	function handlePanStart() {
 		coords.stiffness = coords.damping = 1
-		toFront()
 	}
 
 	function handlePanMove(event: { detail: { dx: number; dy: number } }) {
@@ -126,7 +125,7 @@
 <button
 	in:fade={{ duration: 30 }}
 	out:fade={{ duration: 30 }}
-	on:click={() => toFront()}
+	on:focus={toFront}
 	class="box"
 	style="--width: {size[0]}px; --height: {size[1]}px; --posz: {posZ}; transform: translate({$coords.x}px,{$coords.y}px)">
 	<div

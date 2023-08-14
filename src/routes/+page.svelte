@@ -33,34 +33,25 @@
 	</div>
 {/if}
 
-<div class="view">
-	<Navbar />
+<Navbar />
 
-	<Forkme />
+<Forkme />
 
-	{#each $windowsStore as window}
-		{#if window.active}
-			<Window
-				id={window.id}
-				name={window.name}
-				content={window.content}
-				w={window.w}
-				h={window.h}
-				posX={window.x}
-				posY={window.y}
-				posZ={window.z} />
-		{/if}
-	{/each}
-</div>
+{#each $windowsStore as window}
+	{#if window.active}
+		<Window
+			id={window.id}
+			name={window.name}
+			content={window.content}
+			w={window.w}
+			h={window.h}
+			posX={window.x}
+			posY={window.y}
+			posZ={window.z} />
+	{/if}
+{/each}
 
 <style>
-	.view {
-		position: relative;
-		width: 100%;
-		height: 100%;
-		overflow: hidden;
-	}
-
 	.loading {
 		z-index: 13;
 		position: absolute;

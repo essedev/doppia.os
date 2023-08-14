@@ -21,9 +21,9 @@
 
 	function activateWindow(id: string) {
 		windowsStore.update((windows) => {
-			const wIndex = windows.findIndex((window) => window.id === id)
+			const index = windows.findIndex((window) => window.id === id)
 
-			windows[wIndex].active = !windows[wIndex].active
+			windows[index].active = !windows[index].active
 			return windows
 		})
 
@@ -64,7 +64,9 @@
 
 <style>
 	.navbar {
-		position: fixed;
+		position: absolute;
+		top: 0;
+		left: 0;
 		width: 100%;
 		z-index: 11;
 		display: flex;
@@ -76,11 +78,12 @@
 	.navbar button {
 		cursor: pointer;
 		border: none;
+		background: none;
 	}
 
 	.active {
 		margin-top: 2px;
-		background-color: #dddddda1;
+		background-color: #dddddda1 !important;
 		border-bottom: 2px solid #333333 !important;
 	}
 
