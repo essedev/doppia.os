@@ -142,15 +142,12 @@
 </button>
 
 <style>
-	button {
+	.box {
 		margin: 0;
 		padding: 0;
 		text-align: left;
 		width: var(--width);
 		height: var(--height);
-	}
-
-	.box {
 		z-index: var(--posz);
 		position: absolute;
 		border-radius: 6px;
