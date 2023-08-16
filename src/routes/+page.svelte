@@ -3,9 +3,9 @@
 	import Forkme from "$lib/components/forkme.svelte"
 	import Navbar from "$lib/components/navbar.svelte"
 	import Window from "$lib/components/window.svelte"
-	import "../app.css"
 	import { onMount } from "svelte"
 	import { fade } from "svelte/transition"
+	import "../app.css"
 
 	let isLoading = true
 	let loadingBg = true
@@ -34,7 +34,6 @@
 {/if}
 
 <Navbar />
-
 <Forkme />
 
 {#each $windowsStore as window}

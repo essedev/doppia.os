@@ -2,7 +2,8 @@
 	<a
 		href="https://github.com/doppiaesse/doppia.os"
 		target="_blank"
-		aria-label="View source on GitHub">
+		aria-label="View source on GitHub"
+		tabindex="-1">
 		<button>
 			<svg
 				class="github-corner"
