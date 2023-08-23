@@ -1,4 +1,4 @@
-export function pannable(node: HTMLElement) {
+export function pannable(element: HTMLElement) {
 	let x: number
 	let y: number
 	let isTouchDevice = false
@@ -13,7 +13,7 @@ export function pannable(node: HTMLElement) {
 			? (event as TouchEvent).touches[0].clientY
 			: (event as MouseEvent).clientY
 
-		node.dispatchEvent(new CustomEvent("panstart"))
+		element.dispatchEvent(new CustomEvent("panstart"))
 
 		window.addEventListener(
 			isTouchDevice ? "touchmove" : "mousemove",
@@ -46,7 +46,7 @@ export function pannable(node: HTMLElement) {
 			? (event as TouchEvent).touches[0].clientY
 			: (event as MouseEvent).clientY
 
-		node.dispatchEvent(
+		element.dispatchEvent(
 			new CustomEvent("panmove", {
 				detail: { dx, dy }
 			})
@@ -61,7 +61,7 @@ export function pannable(node: HTMLElement) {
 			? (event as TouchEvent).changedTouches[0].clientY
 			: (event as MouseEvent).clientY
 
-		node.dispatchEvent(new CustomEvent("panend"))
+		element.dispatchEvent(new CustomEvent("panend"))
 
 		window.removeEventListener(
 			isTouchDevice ? "touchmove" : "mousemove",
@@ -73,13 +73,13 @@ export function pannable(node: HTMLElement) {
 		)
 	}
 
-	node.addEventListener("mousedown", handleDown)
-	node.addEventListener("touchstart", handleDown)
+	element.addEventListener("mousedown", handleDown)
+	element.addEventListener("touchstart", handleDown)
 
 	return {
 		destroy() {
-			node.removeEventListener("mousedown", handleDown)
-			node.removeEventListener("touchstart", handleDown)
+			element.removeEventListener("mousedown", handleDown)
+			element.removeEventListener("touchstart", handleDown)
 		}
 	}
 }
