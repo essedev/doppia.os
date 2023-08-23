@@ -122,11 +122,13 @@
 
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} />
 
-<button
+<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+<div
 	in:fade={{ duration: 30 }}
 	out:fade={{ duration: 30 }}
 	on:focus={toFront}
 	class="box"
+	tabindex="0"
 	style="--width: {size[0]}px; --height: {size[1]}px; --posz: {posZ}; transform: translate({$coords.x}px,{$coords.y}px)">
 	<div
 		class="head"
@@ -139,12 +141,10 @@
 	<div class="content">
 		<svelte:component this={content} />
 	</div>
-</button>
+</div>
 
 <style>
 	.box {
-		margin: 0;
-		padding: 0;
 		text-align: left;
 		width: var(--width);
 		height: var(--height);
@@ -153,6 +153,7 @@
 		border-radius: 6px;
 		background-color: #eeeeee;
 		border: 1px solid #cccccc;
+		overflow: hidden;
 	}
 
 	.head {
@@ -179,7 +180,7 @@
 		padding: 15px;
 		font-size: 16px;
 		height: calc(100% - 72px);
-		overflow: scroll;
+		overflow: auto;
 		border-radius: 0px 0px 6px 6px;
 	}
 </style>
