@@ -1,3 +1,5 @@
+import { windowsStore } from "./stores"
+
 export function resizable(element: HTMLElement) {
 	const right = document.createElement("div")
 	right.dataset.direction = "east"
@@ -72,8 +74,6 @@ export function resizable(element: HTMLElement) {
 		const parent = element.parentElement?.getBoundingClientRect()
 		if (!parent) return
 
-		console.log({ rect, parent })
-
 		initialRect = {
 			width: rect.width,
 			height: rect.height,
@@ -88,6 +88,17 @@ export function resizable(element: HTMLElement) {
 	function onMouseup(event: MouseEvent) {
 		if (!active) return
 
+		element.dispatchEvent(
+			new CustomEvent("resized", {
+				detail: {
+					w: parseInt(element.style.width, 10),
+					h: parseInt(element.style.height, 10),
+					x: parseInt(element.style.left, 10),
+					y: parseInt(element.style.top, 10)
+				}
+			})
+		)
+
 		active = null
 		initialRect = null
 		initialPos = null
@@ -101,24 +112,36 @@ export function resizable(element: HTMLElement) {
 
 		if (direction?.match("east")) {
 			delta = event.pageX - initialPos?.x
-			element.style.width = `${initialRect?.width + delta}px`
+			const newWidth = initialRect?.width + delta
+			if (newWidth >= 300) {
+				element.style.width = `${newWidth}px`
+			}
 		}
 
 		if (direction?.match("west")) {
 			delta = initialPos?.x - event.pageX
-			element.style.left = `${initialRect?.left - delta}px`
-			element.style.width = `${initialRect?.width + delta}px`
+			const newWidth = initialRect?.width + delta
+			if (newWidth >= 300) {
+				element.style.left = `${initialRect?.left - delta}px`
+				element.style.width = `${newWidth}px`
+			}
 		}
 
 		if (direction?.match("north")) {
 			delta = initialPos?.y - event.pageY
-			element.style.top = `${initialRect?.top - delta}px`
-			element.style.height = `${initialRect?.height + delta}px`
+			const newHeight = initialRect?.height + delta
+			if (newHeight >= 200) {
+				element.style.top = `${initialRect?.top - delta}px`
+				element.style.height = `${newHeight}px`
+			}
 		}
 
 		if (direction?.match("south")) {
 			delta = event.pageY - initialPos?.y
-			element.style.height = `${initialRect?.height + delta}px`
+			const newHeight = initialRect?.height + delta
+			if (newHeight >= 200) {
+				element.style.height = `${newHeight}px`
+			}
 		}
 	}
 

@@ -7,6 +7,7 @@
 	import { fade } from "svelte/transition"
 	import "../app.css"
 	import Resize from "$lib/components/resize.svelte"
+	import Stats from "$lib/components/stats.svelte"
 
 	let isLoading = true
 	let loadingBg = true
@@ -37,21 +38,19 @@
 <Navbar />
 <Forkme />
 
-<Resize />
+<Stats />
 
-<!-- {#each $windowsStore as window}
+<!-- <Resize /> -->
+
+{#each $windowsStore as window}
 	{#if window.active}
 		<Window
 			id={window.id}
 			name={window.name}
 			content={window.content}
-			w={window.w}
-			h={window.h}
-			posX={window.x}
-			posY={window.y}
-			posZ={window.z} />
+			pos={window.pos} />
 	{/if}
-{/each} -->
+{/each}
 
 <style>
 	.loading {

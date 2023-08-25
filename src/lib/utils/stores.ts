@@ -11,9 +11,7 @@ type window = {
 	content: ComponentType<SvelteComponent>
 	w: number
 	h: number
-	x: number
-	y: number
-	z: number
+	pos: { x: number; y: number; z: number }
 	active: boolean
 }
 
@@ -24,9 +22,7 @@ const windows: window[] = [
 		content: wip,
 		w: 650,
 		h: 400,
-		x: 10,
-		y: 60,
-		z: 10,
+		pos: { x: 20, y: 70, z: 10 },
 		active: true
 	},
 	{
@@ -35,9 +31,7 @@ const windows: window[] = [
 		content: about,
 		w: 650,
 		h: 400,
-		x: 130,
-		y: 170,
-		z: 10,
+		pos: { x: 130, y: 170, z: 10 },
 		active: false
 	},
 	{
@@ -46,9 +40,7 @@ const windows: window[] = [
 		content: projects,
 		w: 650,
 		h: 400,
-		x: 130,
-		y: 170,
-		z: 10,
+		pos: { x: 130, y: 170, z: 10 },
 		active: false
 	},
 	{
@@ -57,9 +49,7 @@ const windows: window[] = [
 		content: contact,
 		w: 650,
 		h: 400,
-		x: 130,
-		y: 170,
-		z: 10,
+		pos: { x: 130, y: 170, z: 10 },
 		active: false
 	}
 ]

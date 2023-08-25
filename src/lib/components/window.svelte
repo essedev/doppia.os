@@ -4,32 +4,29 @@
 	import { spring } from "svelte/motion"
 	import { fade } from "svelte/transition"
 	import { pannable } from "$lib/utils/pannable.js"
+	import { resizable } from "$lib/utils/resizable.js"
 	import { windowsStore } from "$lib/utils/stores"
 
 	export let id: string,
 		name: string,
 		content: ComponentType<SvelteComponent>,
-		w: number,
-		h: number,
-		posX: number,
-		posY: number,
-		posZ: number
+		pos: { x: number; y: number; z: number }
+
+	const offset = 20,
+		navHeight = 50
 
 	let width: number, height: number
-
 	$: width, height && setTimeout(checkOverflow, 300)
 
-	// Calculate the size of the window
-	$: size = [(width * w) / 1900, (height * h) / 900]
+	// Get the window from the store
+	$: currWindow = $windowsStore[$windowsStore.findIndex((w) => w.id === id)]
 
-	// Min window width is 300px
-	$: size[0] = Math.max(300, size[0])
-	// Min window height is 200px
-	$: size[1] = Math.max(200, size[1])
+	// Calculate the size of the window
+	//$: size = [(width * currWindow.w) / 1900, (height * currWindow.h) / 900]
 
 	// Create a spring for the window coordinates
 	const coords = spring(
-		{ x: 0, y: 0 },
+		{ x: pos.x, y: pos.y },
 		{
 			stiffness: 0.2,
 			damping: 0.4
@@ -37,12 +34,9 @@
 	)
 
 	function checkOverflow() {
-		let offset = 10
-		let navHeight = 50
-
 		// Calculate the maximum allowed position for the window
-		const maxX = width - size[0]
-		const maxY = height - size[1]
+		const maxX = width - currWindow.w
+		const maxY = height - currWindow.h
 
 		// Check if the window is outside the horizontal borders
 		let newX = $coords.x
@@ -71,8 +65,8 @@
 		windowsStore.update((windows) => {
 			const index = windows.findIndex((window) => window.id === id)
 
-			windows[index].x = newX
-			windows[index].y = newY
+			windows[index].pos.x = newX
+			windows[index].pos.y = newY
 
 			return windows
 		})
@@ -86,12 +80,12 @@
 			const index = windows.findIndex((window) => window.id === id)
 
 			for (let i = 0; i < windows.length; i++) {
-				if (windows[i].z > windows[index].z) {
-					windows[i].z -= 1
+				if (windows[i].pos.z > windows[index].pos.z) {
+					windows[i].pos.z -= 1
 				}
 			}
 
-			windows[index].z = activeWindowCount
+			windows[index].pos.z = activeWindowCount
 
 			return windows
 		})
@@ -102,9 +96,9 @@
 	}
 
 	function handlePanMove(event: { detail: { dx: number; dy: number } }) {
-		coords.update(($coords) => ({
-			x: $coords.x + event.detail.dx,
-			y: $coords.y + event.detail.dy
+		coords.update((coords) => ({
+			x: coords.x + event.detail.dx,
+			y: coords.y + event.detail.dy
 		}))
 	}
 
@@ -114,8 +108,35 @@
 		checkOverflow()
 	}
 
+	function handleResized(event: {
+		detail: { w: number; h: number; x: number; y: number }
+	}) {
+		if (event.detail.w > width - offset * 2) {
+			event.detail.w = width - offset * 2
+		}
+
+		if (event.detail.h > height - navHeight - offset * 2) {
+			event.detail.h = height - navHeight - offset * 2
+		}
+
+		coords.set({ x: event.detail.x, y: event.detail.y }, { hard: true })
+
+		windowsStore.update((windows) => {
+			const index = windows.findIndex((window) => window.id === id)
+
+			windows[index].w = event.detail.w
+			windows[index].h = event.detail.h
+
+			windows[index].pos.x = event.detail.x
+			windows[index].pos.y = event.detail.y
+
+			return windows
+		})
+
+		checkOverflow()
+	}
+
 	onMount(() => {
-		coords.set({ x: posX, y: posY }, { hard: true })
 		toFront()
 	})
 </script>
@@ -124,43 +145,50 @@
 
 <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <div
+	use:resizable
+	on:resized={handleResized}
 	in:fade={{ duration: 30 }}
 	out:fade={{ duration: 30 }}
 	on:focus={toFront}
+	{id}
 	class="box"
 	tabindex="0"
-	style="--width: {size[0]}px; --height: {size[1]}px; --posz: {posZ}; transform: translate({$coords.x}px,{$coords.y}px)">
-	<div
-		class="head"
-		use:pannable
-		on:panstart={handlePanStart}
-		on:panmove={handlePanMove}
-		on:panend={handlePanEnd}>
-		<span class="name">{name}</span>
-	</div>
-	<div class="content">
-		<svelte:component this={content} />
+	style="width: {currWindow.w}px; height: {currWindow.h}px; z-index: {pos.z}; left: {$coords.x}px; top: {$coords.y}px;">
+	<div class="container">
+		<div
+			class="head"
+			use:pannable
+			on:panstart={handlePanStart}
+			on:panmove={handlePanMove}
+			on:panend={handlePanEnd}>
+			<span class="name">{name}</span>
+		</div>
+		<div class="content">
+			<svelte:component this={content} />
+		</div>
 	</div>
 </div>
 
 <style>
 	.box {
-		text-align: left;
-		width: var(--width);
-		height: var(--height);
-		z-index: var(--posz);
 		position: absolute;
+		text-align: left;
 		border-radius: 6px;
 		background-color: #eeeeee;
 		border: 1px solid #cccccc;
 		overflow: hidden;
 	}
 
+	.container {
+		position: absolute;
+		height: 100%;
+		width: 100%;
+	}
+
 	.head {
 		height: 42px;
 		border-radius: 6px 6px 0px 0px;
 		border-bottom: 1px solid #cccccc;
-		user-select: none;
 		cursor: grab;
 		display: flex;
 		align-items: center;
@@ -182,5 +210,78 @@
 		height: calc(100% - 72px);
 		overflow: auto;
 		border-radius: 0px 0px 6px 6px;
+	}
+
+	:global(.grabber) {
+		position: absolute;
+		box-sizing: border-box;
+	}
+
+	:global(.grabber.right) {
+		width: 10px;
+		height: 100%;
+		right: -5px;
+		cursor: col-resize;
+	}
+
+	:global(.grabber.left) {
+		width: 10px;
+		height: 100%;
+		left: -5px;
+		cursor: col-resize;
+	}
+
+	:global(.grabber.top) {
+		height: 10px;
+		width: 100%;
+		top: -5px;
+		cursor: row-resize;
+	}
+
+	:global(.grabber.bottom) {
+		height: 10px;
+		width: 100%;
+		bottom: -5px;
+		cursor: row-resize;
+	}
+
+	:global(.grabber.top-left) {
+		height: 20px;
+		width: 20px;
+		top: -10px;
+		left: -10px;
+		cursor: nw-resize;
+		border-radius: 100%;
+	}
+
+	:global(.grabber.top-right) {
+		height: 20px;
+		width: 20px;
+		top: -10px;
+		right: -10px;
+		cursor: ne-resize;
+		border-radius: 100%;
+	}
+
+	:global(.grabber.bottom-left) {
+		height: 20px;
+		width: 20px;
+		bottom: -10px;
+		left: -10px;
+		cursor: sw-resize;
+		border-radius: 100%;
+	}
+
+	:global(.grabber.bottom-right) {
+		height: 20px;
+		width: 20px;
+		bottom: -10px;
+		right: -10px;
+		cursor: se-resize;
+		border-radius: 100%;
+	}
+
+	:global(.grabber.selected) {
+		border: solid 1px black;
 	}
 </style>

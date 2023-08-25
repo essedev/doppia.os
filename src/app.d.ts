@@ -12,6 +12,7 @@ declare global {
 			"on:panstart"?: CompositionEventHandler<T>
 			"on:panmove"?: CompositionEventHandler<T>
 			"on:panend"?: CompositionEventHandler<T>
+			"on:resized"?: CompositionEventHandler<T>
 		}
 	}
 }

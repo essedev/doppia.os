@@ -39,6 +39,7 @@ export function pannable(element: HTMLElement) {
 			(isTouchDevice
 				? (event as TouchEvent).touches[0].clientY
 				: (event as MouseEvent).clientY) - y
+
 		x = isTouchDevice
 			? (event as TouchEvent).touches[0].clientX
 			: (event as MouseEvent).clientX
