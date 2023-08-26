@@ -12,7 +12,7 @@
 		content: ComponentType<SvelteComponent>,
 		pos: { x: number; y: number; z: number }
 
-	const offset = 20,
+	const offset = 5,
 		navHeight = 50
 
 	let width: number, height: number

@@ -3,11 +3,10 @@
 	import Forkme from "$lib/components/forkme.svelte"
 	import Navbar from "$lib/components/navbar.svelte"
 	import Window from "$lib/components/window.svelte"
+	import Stats from "$lib/components/stats.svelte"
 	import { onMount } from "svelte"
 	import { fade } from "svelte/transition"
 	import "../app.css"
-	import Resize from "$lib/components/resize.svelte"
-	import Stats from "$lib/components/stats.svelte"
 
 	let isLoading = true
 	let loadingBg = true
@@ -39,8 +38,6 @@
 <Forkme />
 
 <Stats />
-
-<!-- <Resize /> -->
 
 {#each $windowsStore as window}
 	{#if window.active}
