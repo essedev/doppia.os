@@ -1,6 +1,6 @@
 <div class="container">
 	<a
-		href="https://github.com/doppiaesse/doppia.os"
+		href="https://github.com/essedev/doppia.os"
 		target="_blank"
 		aria-label="View source on GitHub">
 		<svg
