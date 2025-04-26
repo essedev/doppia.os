@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { windowsStore } from "$lib/utils/stores"
+	import { windowsStore } from '$lib/utils/stores';
 
-	let selectedWindowId: string = ""
-	$: selectedWindow = $windowsStore.find((w) => w.id === selectedWindowId)
+	let selectedWindowId: string = '';
+	$: selectedWindow = $windowsStore.find((w) => w.id === selectedWindowId);
 </script>
 
 <div class="stats">

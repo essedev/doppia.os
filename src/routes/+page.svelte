@@ -1,24 +1,24 @@
 <script lang="ts">
-	import { windowsStore } from "$lib/utils/stores"
-	import Forkme from "$lib/components/forkme.svelte"
-	import Navbar from "$lib/components/navbar.svelte"
-	import Window from "$lib/components/window.svelte"
-	import Stats from "$lib/components/stats.svelte"
-	import { onMount } from "svelte"
-	import { fade } from "svelte/transition"
-	import "../app.css"
+	import { windowsStore } from '$lib/utils/stores';
+	import Forkme from '$lib/components/forkme.svelte';
+	import Navbar from '$lib/components/navbar.svelte';
+	import Window from '$lib/components/window.svelte';
+	import Stats from '$lib/components/stats.svelte';
+	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
+	import '../app.css';
 
-	let isLoading = true
-	let loadingBg = true
+	let isLoading = true;
+	let loadingBg = true;
 	onMount(() => {
 		setTimeout(() => {
-			loadingBg = false
-		}, 200)
+			loadingBg = false;
+		}, 200);
 
 		setTimeout(() => {
-			isLoading = false
-		}, 1300)
-	})
+			isLoading = false;
+		}, 1300);
+	});
 </script>
 
 <svelte:head>
@@ -41,11 +41,7 @@
 
 {#each $windowsStore as window}
 	{#if window.active}
-		<Window
-			id={window.id}
-			name={window.name}
-			content={window.content}
-			pos={window.pos} />
+		<Window id={window.id} name={window.name} content={window.content} pos={window.pos} />
 	{/if}
 {/each}
 

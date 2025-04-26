@@ -1,25 +1,25 @@
 <script lang="ts">
-	import { SvelteComponent, onMount } from "svelte"
-	import type { ComponentType } from "svelte"
-	import { spring } from "svelte/motion"
-	import { fade } from "svelte/transition"
-	import { pannable } from "$lib/utils/pannable.js"
-	import { resizable } from "$lib/utils/resizable.js"
-	import { windowsStore } from "$lib/utils/stores"
+	import { SvelteComponent, onMount } from 'svelte';
+	import type { ComponentType } from 'svelte';
+	import { spring } from 'svelte/motion';
+	import { fade } from 'svelte/transition';
+	import { pannable } from '$lib/utils/pannable.js';
+	import { resizable } from '$lib/utils/resizable.js';
+	import { windowsStore } from '$lib/utils/stores';
 
 	export let id: string,
 		name: string,
 		content: ComponentType<SvelteComponent>,
-		pos: { x: number; y: number; z: number }
+		pos: { x: number; y: number; z: number };
 
 	const offset = 5,
-		navHeight = 50
+		navHeight = 50;
 
-	let width: number, height: number
-	$: width, height && setTimeout(checkOverflow, 300)
+	let width: number, height: number;
+	$: width, height && setTimeout(checkOverflow, 300);
 
 	// Get the window from the store
-	$: currWindow = $windowsStore[$windowsStore.findIndex((w) => w.id === id)]
+	$: currWindow = $windowsStore[$windowsStore.findIndex((w) => w.id === id)];
 
 	// Calculate the size of the window
 	//$: size = [(width * currWindow.w) / 1900, (height * currWindow.h) / 900]
@@ -31,114 +31,112 @@
 			stiffness: 0.2,
 			damping: 0.4
 		}
-	)
+	);
 
 	function checkOverflow() {
 		// Calculate the maximum allowed position for the window
-		const maxX = width - currWindow.w
-		const maxY = height - currWindow.h
+		const maxX = width - currWindow.w;
+		const maxY = height - currWindow.h;
 
 		// Check if the window is outside the horizontal borders
-		let newX = $coords.x
+		let newX = $coords.x;
 		if ($coords.x < 0) {
 			// Return the window to the start of the visible window
-			newX = 0 + offset
+			newX = 0 + offset;
 		} else if ($coords.x > maxX) {
 			// Return the window to the end of the visible window
-			newX = maxX - offset
+			newX = maxX - offset;
 		}
 
 		// Check if the window is outside the vertical borders
-		let newY = $coords.y
+		let newY = $coords.y;
 		if ($coords.y < 0 + navHeight) {
 			// Return the window to the start of the visible window
-			newY = 0 + offset + navHeight
+			newY = 0 + offset + navHeight;
 		} else if ($coords.y > maxY) {
 			// Return the window to the end of the visible window
-			newY = maxY - offset
+			newY = maxY - offset;
 		}
 
 		// Set the new window coordinates
-		coords.set({ x: newX, y: newY })
+		coords.set({ x: newX, y: newY });
 
 		// Update the coordinates of the window in the store
 		windowsStore.update((windows) => {
-			const index = windows.findIndex((window) => window.id === id)
+			const index = windows.findIndex((window) => window.id === id);
 
-			windows[index].pos.x = newX
-			windows[index].pos.y = newY
+			windows[index].pos.x = newX;
+			windows[index].pos.y = newY;
 
-			return windows
-		})
+			return windows;
+		});
 	}
 
 	function toFront() {
 		windowsStore.update((windows) => {
-			const activeWindows = windows.filter((window) => window.active)
-			const activeWindowCount = activeWindows.length
+			const activeWindows = windows.filter((window) => window.active);
+			const activeWindowCount = activeWindows.length;
 
-			const index = windows.findIndex((window) => window.id === id)
+			const index = windows.findIndex((window) => window.id === id);
 
 			for (let i = 0; i < windows.length; i++) {
 				if (windows[i].pos.z > windows[index].pos.z) {
-					windows[i].pos.z -= 1
+					windows[i].pos.z -= 1;
 				}
 			}
 
-			windows[index].pos.z = activeWindowCount
+			windows[index].pos.z = activeWindowCount;
 
-			return windows
-		})
+			return windows;
+		});
 	}
 
 	function handlePanStart() {
-		coords.stiffness = coords.damping = 1
+		coords.stiffness = coords.damping = 1;
 	}
 
 	function handlePanMove(event: { detail: { dx: number; dy: number } }) {
 		coords.update((coords) => ({
 			x: coords.x + event.detail.dx,
 			y: coords.y + event.detail.dy
-		}))
+		}));
 	}
 
 	function handlePanEnd() {
-		coords.stiffness = 0.2
-		coords.damping = 0.4
-		checkOverflow()
+		coords.stiffness = 0.2;
+		coords.damping = 0.4;
+		checkOverflow();
 	}
 
-	function handleResized(event: {
-		detail: { w: number; h: number; x: number; y: number }
-	}) {
+	function handleResized(event: { detail: { w: number; h: number; x: number; y: number } }) {
 		if (event.detail.w > width - offset * 2) {
-			event.detail.w = width - offset * 2
+			event.detail.w = width - offset * 2;
 		}
 
 		if (event.detail.h > height - navHeight - offset * 2) {
-			event.detail.h = height - navHeight - offset * 2
+			event.detail.h = height - navHeight - offset * 2;
 		}
 
-		coords.set({ x: event.detail.x, y: event.detail.y }, { hard: true })
+		coords.set({ x: event.detail.x, y: event.detail.y }, { hard: true });
 
 		windowsStore.update((windows) => {
-			const index = windows.findIndex((window) => window.id === id)
+			const index = windows.findIndex((window) => window.id === id);
 
-			windows[index].w = event.detail.w
-			windows[index].h = event.detail.h
+			windows[index].w = event.detail.w;
+			windows[index].h = event.detail.h;
 
-			windows[index].pos.x = event.detail.x
-			windows[index].pos.y = event.detail.y
+			windows[index].pos.x = event.detail.x;
+			windows[index].pos.y = event.detail.y;
 
-			return windows
-		})
+			return windows;
+		});
 
-		checkOverflow()
+		checkOverflow();
 	}
 
 	onMount(() => {
-		toFront()
-	})
+		toFront();
+	});
 </script>
 
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} />
@@ -153,14 +151,16 @@
 	{id}
 	class="box"
 	tabindex="0"
-	style="width: {currWindow.w}px; height: {currWindow.h}px; z-index: {pos.z}; left: {$coords.x}px; top: {$coords.y}px;">
+	style="width: {currWindow.w}px; height: {currWindow.h}px; z-index: {pos.z}; left: {$coords.x}px; top: {$coords.y}px;"
+>
 	<div class="container">
 		<div
 			class="head"
 			use:pannable
 			on:panstart={handlePanStart}
 			on:panmove={handlePanMove}
-			on:panend={handlePanEnd}>
+			on:panend={handlePanEnd}
+		>
 			<span class="name">{name}</span>
 		</div>
 		<div class="content">

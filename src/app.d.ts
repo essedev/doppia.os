@@ -9,12 +9,12 @@ declare global {
 
 	declare namespace svelteHTML {
 		interface HTMLAttributes<T> {
-			"on:panstart"?: CompositionEventHandler<T>
-			"on:panmove"?: CompositionEventHandler<T>
-			"on:panend"?: CompositionEventHandler<T>
-			"on:resized"?: CompositionEventHandler<T>
+			'on:panstart'?: CompositionEventHandler<T>;
+			'on:panmove'?: CompositionEventHandler<T>;
+			'on:panend'?: CompositionEventHandler<T>;
+			'on:resized'?: CompositionEventHandler<T>;
 		}
 	}
 }
 
-export {}
+export {};
