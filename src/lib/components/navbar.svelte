@@ -35,7 +35,7 @@
 </script>
 
 <div class="navbar">
-	<button class="menuBtn">
+	<button class="menuBtn" aria-label="Open menu">
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
@@ -55,7 +55,7 @@
 	>
 	<button id="contact" class="link-btn" on:click={() => activateWindow('contact')}>Contact</button>
 
-	<button class="fullscreenBtn" on:click={fullscreenToggle}>
+	<button class="fullscreenBtn" on:click={fullscreenToggle} aria-label="Toggle fullscreen">
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"

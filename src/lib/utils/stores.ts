@@ -1,14 +1,14 @@
-import { writable } from 'svelte/store';
-import type { SvelteComponent, ComponentType } from 'svelte';
-import wip from '$lib/components/windows/wip.svelte';
 import about from '$lib/components/windows/about.svelte';
-import projects from '$lib/components/windows/projects.svelte';
 import contact from '$lib/components/windows/contact.svelte';
+import projects from '$lib/components/windows/projects.svelte';
+import wip from '$lib/components/windows/wip.svelte';
+import type { Component } from 'svelte';
+import { writable } from 'svelte/store';
 
 type window = {
 	id: string;
 	name: string;
-	content: ComponentType<SvelteComponent>;
+	content: Component;
 	w: number;
 	h: number;
 	pos: { x: number; y: number; z: number };

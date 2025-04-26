@@ -1,16 +1,13 @@
 <script lang="ts">
-	import { SvelteComponent, onMount } from 'svelte';
-	import type { ComponentType } from 'svelte';
-	import { spring } from 'svelte/motion';
-	import { fade } from 'svelte/transition';
 	import { pannable } from '$lib/utils/pannable.js';
 	import { resizable } from '$lib/utils/resizable.js';
 	import { windowsStore } from '$lib/utils/stores';
+	import type { Component } from 'svelte';
+	import { onMount } from 'svelte';
+	import { Spring } from 'svelte/motion';
+	import { fade } from 'svelte/transition';
 
-	export let id: string,
-		name: string,
-		content: ComponentType<SvelteComponent>,
-		pos: { x: number; y: number; z: number };
+	export let id: string, name: string, content: Component, pos: { x: number; y: number; z: number };
 
 	const offset = 5,
 		navHeight = 50;
@@ -24,8 +21,8 @@
 	// Calculate the size of the window
 	//$: size = [(width * currWindow.w) / 1900, (height * currWindow.h) / 900]
 
-	// Create a spring for the window coordinates
-	const coords = spring(
+	// Create a spring for the window coordinates using new Spring class
+	const coords = new Spring(
 		{ x: pos.x, y: pos.y },
 		{
 			stiffness: 0.2,
@@ -39,21 +36,21 @@
 		const maxY = height - currWindow.h;
 
 		// Check if the window is outside the horizontal borders
-		let newX = $coords.x;
-		if ($coords.x < 0) {
+		let newX = coords.current.x;
+		if (coords.current.x < 0) {
 			// Return the window to the start of the visible window
 			newX = 0 + offset;
-		} else if ($coords.x > maxX) {
+		} else if (coords.current.x > maxX) {
 			// Return the window to the end of the visible window
 			newX = maxX - offset;
 		}
 
 		// Check if the window is outside the vertical borders
-		let newY = $coords.y;
-		if ($coords.y < 0 + navHeight) {
+		let newY = coords.current.y;
+		if (coords.current.y < 0 + navHeight) {
 			// Return the window to the start of the visible window
 			newY = 0 + offset + navHeight;
-		} else if ($coords.y > maxY) {
+		} else if (coords.current.y > maxY) {
 			// Return the window to the end of the visible window
 			newY = maxY - offset;
 		}
@@ -92,14 +89,16 @@
 	}
 
 	function handlePanStart() {
-		coords.stiffness = coords.damping = 1;
+		coords.stiffness = 1;
+		coords.damping = 1;
 	}
 
 	function handlePanMove(event: { detail: { dx: number; dy: number } }) {
-		coords.update((coords) => ({
-			x: coords.x + event.detail.dx,
-			y: coords.y + event.detail.dy
-		}));
+		const current = coords.current;
+		coords.set({
+			x: current.x + event.detail.dx,
+			y: current.y + event.detail.dy
+		});
 	}
 
 	function handlePanEnd() {
@@ -117,7 +116,7 @@
 			event.detail.h = height - navHeight - offset * 2;
 		}
 
-		coords.set({ x: event.detail.x, y: event.detail.y }, { hard: true });
+		coords.set({ x: event.detail.x, y: event.detail.y }, { instant: true });
 
 		windowsStore.update((windows) => {
 			const index = windows.findIndex((window) => window.id === id);
@@ -151,7 +150,8 @@
 	{id}
 	class="box"
 	tabindex="0"
-	style="width: {currWindow.w}px; height: {currWindow.h}px; z-index: {pos.z}; left: {$coords.x}px; top: {$coords.y}px;"
+	style="width: {currWindow.w}px; height: {currWindow.h}px; z-index: {pos.z}; left: {coords.current
+		.x}px; top: {coords.current.y}px;"
 >
 	<div class="container">
 		<div
