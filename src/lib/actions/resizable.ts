@@ -1,6 +1,6 @@
-import { windowsStore } from './stores';
+// Resizable action: adds resize handles (grabbers) to an element, enabling it to be resized by dragging its edges and corners
 
-export function resizable(element: HTMLElement) {
+export function resizable(element: HTMLElement, options: { disabled?: boolean } = {}) {
 	const right = document.createElement('div');
 	right.dataset.direction = 'east';
 	right.classList.add('grabber');
@@ -54,12 +54,30 @@ export function resizable(element: HTMLElement) {
 		} | null = null,
 		initialPos: { x: any; y: any } | null = null;
 
+	// Create and append resize grabbers for all eight directions
 	grabbers.forEach((grabber) => {
 		element.appendChild(grabber);
 		grabber.addEventListener('mousedown', onMousedown);
 	});
 
+	// Update grabber visibility based on disabled status
+	function updateGrabbers(disabled = false) {
+		grabbers.forEach((grabber) => {
+			if (disabled) {
+				grabber.style.display = 'none';
+			} else {
+				grabber.style.display = 'block';
+			}
+		});
+	}
+
+	// Initial setting of visibility
+	updateGrabbers(options.disabled);
+
+	// Handle mouse down on a grabber: store active handle and initial dimensions and pointer position
 	function onMousedown(event: MouseEvent) {
+		if (options.disabled) return;
+
 		active = event.target as HTMLElement;
 		const rect = element.getBoundingClientRect();
 		const parent = element.parentElement?.getBoundingClientRect();
@@ -76,6 +94,7 @@ export function resizable(element: HTMLElement) {
 		initialPos = { x: event.pageX, y: event.pageY };
 	}
 
+	// Handle mouse up: dispatch 'resized' event with new dimensions and clear active state
 	function onMouseup(event: MouseEvent) {
 		if (!active) return;
 
@@ -95,8 +114,9 @@ export function resizable(element: HTMLElement) {
 		initialPos = null;
 	}
 
+	// Handle mouse move: update element size and position according to drag direction
 	function onMove(event: MouseEvent) {
-		if (!active) return;
+		if (!active || options.disabled) return;
 
 		const direction = active.dataset.direction;
 		let delta;
@@ -140,12 +160,19 @@ export function resizable(element: HTMLElement) {
 	window.addEventListener('mouseup', onMouseup);
 
 	return {
+		update(newOptions: { disabled?: boolean } = {}) {
+			options = newOptions;
+			updateGrabbers(options.disabled);
+		},
 		destroy() {
 			window.removeEventListener('mousemove', onMove);
-			window.removeEventListener('mousemove', onMousedown);
+			window.removeEventListener('mouseup', onMouseup);
 
 			grabbers.forEach((grabber) => {
-				element.removeChild(grabber);
+				grabber.removeEventListener('mousedown', onMousedown);
+				if (element.contains(grabber)) {
+					element.removeChild(grabber);
+				}
 			});
 		}
 	};

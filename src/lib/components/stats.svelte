@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { windowsStore } from '$lib/utils/stores';
+	import { windowsStore } from '$lib/stores/windows';
 
 	let selectedWindowId: string = '';
 	$: selectedWindow = $windowsStore.find((w) => w.id === selectedWindowId);

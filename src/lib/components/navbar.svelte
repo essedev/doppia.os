@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { windowsStore } from '$lib/utils/stores';
+	import { windowsStore } from '$lib/stores/windows';
 
 	function fullscreenToggle() {
 		const fullscreenElement = document.fullscreenElement as HTMLElement;
@@ -22,15 +22,46 @@
 		}
 	}
 
-	function activateWindow(id: string) {
+	// Unified window management
+	function handleWindowButton(id: string) {
 		windowsStore.update((windows) => {
 			const index = windows.findIndex((window) => window.id === id);
 
-			windows[index].active = !windows[index].active;
+			if (index !== -1) {
+				// If the window is already active
+				if (windows[index].active) {
+					// If it's minimized, restore it
+					if (windows[index].isMinimized) {
+						windows[index].isMinimized = false;
+					} else {
+						// Otherwise, minimize it
+						windows[index].isMinimized = true;
+					}
+				} else {
+					// If it's not active, open it
+					windows[index].active = true;
+					windows[index].isMinimized = false;
+
+					// Assign the highest z-index
+					const activeWindows = windows.filter((w) => w.active);
+					windows[index].pos.z = activeWindows.length;
+				}
+			}
+
 			return windows;
 		});
+	}
 
-		document.getElementById(id)?.classList.toggle('active');
+	// Check if the window is active
+	function isWindowActive(id: string) {
+		const windowData = $windowsStore.find((window) => window.id === id);
+		return windowData?.active || false;
+	}
+
+	// Check if the window is minimized
+	function isWindowMinimized(id: string) {
+		const windowData = $windowsStore.find((window) => window.id === id);
+		return windowData?.isMinimized || false;
 	}
 </script>
 
@@ -48,12 +79,45 @@
 		>
 	</button>
 
-	<button id="wip" class="link-btn active" on:click={() => activateWindow('wip')}> Home </button>
-	<button id="about" class="link-btn" on:click={() => activateWindow('about')}> About </button>
-	<button id="projects" class="link-btn" on:click={() => activateWindow('projects')}
-		>Projects</button
+	<button
+		id="wip"
+		class="link-btn"
+		class:active={isWindowActive('wip')}
+		class:minimized={isWindowMinimized('wip')}
+		on:click={() => handleWindowButton('wip')}
 	>
-	<button id="contact" class="link-btn" on:click={() => activateWindow('contact')}>Contact</button>
+		Home
+	</button>
+
+	<button
+		id="about"
+		class="link-btn"
+		class:active={isWindowActive('about')}
+		class:minimized={isWindowMinimized('about')}
+		on:click={() => handleWindowButton('about')}
+	>
+		About
+	</button>
+
+	<button
+		id="projects"
+		class="link-btn"
+		class:active={isWindowActive('projects')}
+		class:minimized={isWindowMinimized('projects')}
+		on:click={() => handleWindowButton('projects')}
+	>
+		Projects
+	</button>
+
+	<button
+		id="contact"
+		class="link-btn"
+		class:active={isWindowActive('contact')}
+		class:minimized={isWindowMinimized('contact')}
+		on:click={() => handleWindowButton('contact')}
+	>
+		Contact
+	</button>
 
 	<button class="fullscreenBtn" on:click={fullscreenToggle} aria-label="Toggle fullscreen">
 		<svg
@@ -96,10 +160,16 @@
 		border-bottom: 2px solid #333333 !important;
 	}
 
+	.minimized {
+		opacity: 0.7;
+		border-bottom: 2px dashed #555555 !important;
+	}
+
 	.link-btn {
 		margin-left: 10px;
 		padding: 0 10px 0 10px;
 		font-size: 18px;
+		transition: all 0.2s ease;
 	}
 
 	/* Style the fullscreen button */

@@ -5,7 +5,7 @@ import wip from '$lib/components/windows/wip.svelte';
 import type { Component } from 'svelte';
 import { writable } from 'svelte/store';
 
-type window = {
+export type WindowData = {
 	id: string;
 	name: string;
 	content: Component;
@@ -13,9 +13,12 @@ type window = {
 	h: number;
 	pos: { x: number; y: number; z: number };
 	active: boolean;
+	isMinimized: boolean;
+	isMaximized: boolean;
+	previousSize?: { w: number; h: number; pos: { x: number; y: number } };
 };
 
-const windows: window[] = [
+const windows: WindowData[] = [
 	{
 		id: 'wip',
 		name: 'WORK IN PROGRESS',
@@ -23,7 +26,9 @@ const windows: window[] = [
 		w: 650,
 		h: 400,
 		pos: { x: 20, y: 70, z: 10 },
-		active: true
+		active: true,
+		isMinimized: false,
+		isMaximized: false
 	},
 	{
 		id: 'about',
@@ -32,7 +37,9 @@ const windows: window[] = [
 		w: 650,
 		h: 400,
 		pos: { x: 130, y: 170, z: 10 },
-		active: false
+		active: false,
+		isMinimized: false,
+		isMaximized: false
 	},
 	{
 		id: 'projects',
@@ -41,7 +48,9 @@ const windows: window[] = [
 		w: 650,
 		h: 400,
 		pos: { x: 130, y: 170, z: 10 },
-		active: false
+		active: false,
+		isMinimized: false,
+		isMaximized: false
 	},
 	{
 		id: 'contact',
@@ -50,8 +59,10 @@ const windows: window[] = [
 		w: 650,
 		h: 400,
 		pos: { x: 130, y: 170, z: 10 },
-		active: false
+		active: false,
+		isMinimized: false,
+		isMaximized: false
 	}
 ];
 
-export const windowsStore = writable(windows);
+export const windowsStore = writable(windows); 
