@@ -12,7 +12,11 @@ export function pannable(element: HTMLElement) {
 		x = isTouchDevice ? (event as TouchEvent).touches[0].clientX : (event as MouseEvent).clientX;
 		y = isTouchDevice ? (event as TouchEvent).touches[0].clientY : (event as MouseEvent).clientY;
 
-		element.dispatchEvent(new CustomEvent('panstart'));
+		element.dispatchEvent(
+			new CustomEvent('panstart', {
+				detail: { x, y }
+			})
+		);
 
 		window.addEventListener(isTouchDevice ? 'touchmove' : 'mousemove', handleMove);
 		window.addEventListener(isTouchDevice ? 'touchend' : 'mouseup', handleUp);
@@ -25,19 +29,22 @@ export function pannable(element: HTMLElement) {
 			return;
 		}
 
-		const dx =
-			(isTouchDevice ? (event as TouchEvent).touches[0].clientX : (event as MouseEvent).clientX) -
-			x;
-		const dy =
-			(isTouchDevice ? (event as TouchEvent).touches[0].clientY : (event as MouseEvent).clientY) -
-			y;
+		const currentX = isTouchDevice
+			? (event as TouchEvent).touches[0].clientX
+			: (event as MouseEvent).clientX;
+		const currentY = isTouchDevice
+			? (event as TouchEvent).touches[0].clientY
+			: (event as MouseEvent).clientY;
 
-		x = isTouchDevice ? (event as TouchEvent).touches[0].clientX : (event as MouseEvent).clientX;
-		y = isTouchDevice ? (event as TouchEvent).touches[0].clientY : (event as MouseEvent).clientY;
+		const dx = currentX - x;
+		const dy = currentY - y;
+
+		x = currentX;
+		y = currentY;
 
 		element.dispatchEvent(
 			new CustomEvent('panmove', {
-				detail: { dx, dy }
+				detail: { dx, dy, x, y }
 			})
 		);
 	}
@@ -51,7 +58,11 @@ export function pannable(element: HTMLElement) {
 			? (event as TouchEvent).changedTouches[0].clientY
 			: (event as MouseEvent).clientY;
 
-		element.dispatchEvent(new CustomEvent('panend'));
+		element.dispatchEvent(
+			new CustomEvent('panend', {
+				detail: { x, y }
+			})
+		);
 
 		window.removeEventListener(isTouchDevice ? 'touchmove' : 'mousemove', handleMove);
 		window.removeEventListener(isTouchDevice ? 'touchend' : 'mouseup', handleUp);
@@ -66,4 +77,4 @@ export function pannable(element: HTMLElement) {
 			element.removeEventListener('touchstart', handleDown);
 		}
 	};
-} 
+}

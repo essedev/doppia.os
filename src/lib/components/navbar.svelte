@@ -42,6 +42,14 @@
 					windows[index].active = true;
 					windows[index].isMinimized = false;
 
+					// Add 100 to x and y for each window already open
+					windows.forEach((w) => {
+						if (w.active && w.id !== id) {
+							windows[index].pos.x += 100;
+							windows[index].pos.y += 100;
+						}
+					});
+
 					// Assign the highest z-index
 					const activeWindows = windows.filter((w) => w.active);
 					windows[index].pos.z = activeWindows.length;

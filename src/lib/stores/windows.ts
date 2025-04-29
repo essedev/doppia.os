@@ -15,6 +15,8 @@ export type WindowData = {
 	active: boolean;
 	isMinimized: boolean;
 	isMaximized: boolean;
+	isPreview?: boolean;
+	previewFor?: string;
 	previousSize?: { w: number; h: number; pos: { x: number; y: number } };
 };
 
@@ -36,7 +38,7 @@ const windows: WindowData[] = [
 		content: about,
 		w: 650,
 		h: 400,
-		pos: { x: 130, y: 170, z: 10 },
+		pos: { x: 20, y: 70, z: 10 },
 		active: false,
 		isMinimized: false,
 		isMaximized: false
@@ -47,7 +49,7 @@ const windows: WindowData[] = [
 		content: projects,
 		w: 650,
 		h: 400,
-		pos: { x: 130, y: 170, z: 10 },
+		pos: { x: 20, y: 70, z: 10 },
 		active: false,
 		isMinimized: false,
 		isMaximized: false
@@ -58,11 +60,11 @@ const windows: WindowData[] = [
 		content: contact,
 		w: 650,
 		h: 400,
-		pos: { x: 130, y: 170, z: 10 },
+		pos: { x: 20, y: 70, z: 10 },
 		active: false,
 		isMinimized: false,
 		isMaximized: false
 	}
 ];
 
-export const windowsStore = writable(windows); 
+export const windowsStore = writable(windows);

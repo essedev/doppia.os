@@ -11,7 +11,7 @@ export function windowManager(
 	navHeight: number
 ) {
 	// Checks and corrects window overflow beyond viewport boundaries
-	function checkOverflow(width: number, height: number) {
+	function checkOverflow(width: number, height: number, instant: boolean = false) {
 		// Obtain the latest window data from the store
 		let window: WindowData | undefined;
 
@@ -53,7 +53,7 @@ export function windowManager(
 		}
 
 		// Apply corrected coordinates to the Spring animation
-		coords.set({ x: newX, y: newY });
+		coords.set({ x: newX, y: newY }, { instant });
 
 		// Update the window position in the store
 		windowsStore.update((windows) => {

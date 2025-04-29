@@ -32,11 +32,11 @@
 
 	{#if selectedWindow && selectedWindow.active}
 		<div class="metrics">
-			<div><span class="label">WIDTH:</span> <span>{selectedWindow.w}px</span></div>
-			<div><span class="label">HEIGHT:</span> <span>{selectedWindow.h}px</span></div>
-			<div><span class="label">X:</span> <span>{selectedWindow.pos.x}px</span></div>
-			<div><span class="label">Y:</span> <span>{selectedWindow.pos.y}px</span></div>
-			<div><span class="label">Z:</span> <span>{selectedWindow.pos.z}</span></div>
+			<div><span class="label">WIDTH:</span> <span>{selectedWindow.w.toFixed(0)}px</span></div>
+			<div><span class="label">HEIGHT:</span> <span>{selectedWindow.h.toFixed(0)}px</span></div>
+			<div><span class="label">X:</span> <span>{selectedWindow.pos.x.toFixed(0)}px</span></div>
+			<div><span class="label">Y:</span> <span>{selectedWindow.pos.y.toFixed(0)}px</span></div>
+			<div><span class="label">Z:</span> <span>{selectedWindow.pos.z.toFixed(0)}</span></div>
 		</div>
 	{/if}
 </div>
