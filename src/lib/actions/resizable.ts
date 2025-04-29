@@ -54,6 +54,9 @@ export function resizable(element: HTMLElement, options: { disabled?: boolean } 
 		} | null = null,
 		initialPos: { x: any; y: any } | null = null;
 
+	// Variabile reattiva locale per tenere traccia dello stato disabled
+	let isDisabled = !!options.disabled;
+
 	// Create and append resize grabbers for all eight directions
 	grabbers.forEach((grabber) => {
 		element.appendChild(grabber);
@@ -62,11 +65,17 @@ export function resizable(element: HTMLElement, options: { disabled?: boolean } 
 
 	// Update grabber visibility based on disabled status
 	function updateGrabbers(disabled = false) {
+		isDisabled = disabled;
+
 		grabbers.forEach((grabber) => {
+			// Use CSS display property to control visibility
+			grabber.style.display = disabled ? 'none' : 'block';
+
+			// For additional safety, also add/remove a disabled class
 			if (disabled) {
-				grabber.style.display = 'none';
+				grabber.classList.add('disabled');
 			} else {
-				grabber.style.display = 'block';
+				grabber.classList.remove('disabled');
 			}
 		});
 	}
@@ -76,7 +85,10 @@ export function resizable(element: HTMLElement, options: { disabled?: boolean } 
 
 	// Handle mouse down on a grabber: store active handle and initial dimensions and pointer position
 	function onMousedown(event: MouseEvent) {
-		if (options.disabled) return;
+		// Early return if resizing is disabled
+		if (isDisabled) {
+			return;
+		}
 
 		active = event.target as HTMLElement;
 		const rect = element.getBoundingClientRect();
@@ -95,7 +107,7 @@ export function resizable(element: HTMLElement, options: { disabled?: boolean } 
 	}
 
 	// Handle mouse up: dispatch 'resized' event with new dimensions and clear active state
-	function onMouseup(event: MouseEvent) {
+	function onMouseup() {
 		if (!active) return;
 
 		element.dispatchEvent(
@@ -116,43 +128,71 @@ export function resizable(element: HTMLElement, options: { disabled?: boolean } 
 
 	// Handle mouse move: update element size and position according to drag direction
 	function onMove(event: MouseEvent) {
-		if (!active || options.disabled) return;
+		// Return immediately if no active grabber or if resizing is disabled
+		if (!active || isDisabled) return;
 
 		const direction = active.dataset.direction;
 		let delta;
+		let hasChanged = false;
+		let newWidth, newHeight, newLeft, newTop;
+
+		newLeft = parseInt(element.style.left, 10) || initialRect?.left || 0;
+		newTop = parseInt(element.style.top, 10) || initialRect?.top || 0;
+		newWidth = parseInt(element.style.width, 10) || initialRect?.width || 0;
+		newHeight = parseInt(element.style.height, 10) || initialRect?.height || 0;
 
 		if (direction?.match('east')) {
 			delta = event.pageX - initialPos?.x;
-			const newWidth = initialRect?.width + delta;
+			newWidth = initialRect?.width + delta;
 			if (newWidth >= 300) {
 				element.style.width = `${newWidth}px`;
+				hasChanged = true;
 			}
 		}
 
 		if (direction?.match('west')) {
 			delta = initialPos?.x - event.pageX;
-			const newWidth = initialRect?.width + delta;
+			newWidth = initialRect?.width + delta;
 			if (newWidth >= 300) {
-				element.style.left = `${initialRect?.left - delta}px`;
+				newLeft = initialRect?.left - delta;
+				element.style.left = `${newLeft}px`;
 				element.style.width = `${newWidth}px`;
+				hasChanged = true;
 			}
 		}
 
 		if (direction?.match('north')) {
 			delta = initialPos?.y - event.pageY;
-			const newHeight = initialRect?.height + delta;
+			newHeight = initialRect?.height + delta;
 			if (newHeight >= 200) {
-				element.style.top = `${initialRect?.top - delta}px`;
+				newTop = initialRect?.top - delta;
+				element.style.top = `${newTop}px`;
 				element.style.height = `${newHeight}px`;
+				hasChanged = true;
 			}
 		}
 
 		if (direction?.match('south')) {
 			delta = event.pageY - initialPos?.y;
-			const newHeight = initialRect?.height + delta;
+			newHeight = initialRect?.height + delta;
 			if (newHeight >= 200) {
 				element.style.height = `${newHeight}px`;
+				hasChanged = true;
 			}
+		}
+
+		// If dimensions changed, dispatch real-time resizing event
+		if (hasChanged) {
+			element.dispatchEvent(
+				new CustomEvent('resizing', {
+					detail: {
+						w: newWidth,
+						h: newHeight,
+						x: newLeft,
+						y: newTop
+					}
+				})
+			);
 		}
 	}
 
@@ -161,8 +201,23 @@ export function resizable(element: HTMLElement, options: { disabled?: boolean } 
 
 	return {
 		update(newOptions: { disabled?: boolean } = {}) {
+			const wasDisabled = isDisabled;
+			const nowDisabled = !!newOptions.disabled;
+
+			// Aggiorniamo la variabile delle opzioni
 			options = newOptions;
-			updateGrabbers(options.disabled);
+
+			// Se lo stato è cambiato, aggiorniamo i grabber
+			if (wasDisabled !== nowDisabled) {
+				updateGrabbers(nowDisabled);
+
+				// Clear any active resizing when window is maximized
+				if (nowDisabled && active) {
+					active = null;
+					initialRect = null;
+					initialPos = null;
+				}
+			}
 		},
 		destroy() {
 			window.removeEventListener('mousemove', onMove);

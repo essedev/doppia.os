@@ -13,9 +13,9 @@ declare global {
 			onpanmove?: CompositionEventHandler<T>;
 			onpanend?: CompositionEventHandler<T>;
 			onresized?: CompositionEventHandler<T>;
+			onresizing?: CompositionEventHandler<T>;
 		}
 	}
 }
 
-export { };
-
+export {};

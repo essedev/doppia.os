@@ -69,13 +69,27 @@
 		if (currentWindow?.isMaximized) return;
 
 		const current = coords.current;
+		const newX = current.x + event.detail.dx;
+		const newY = current.y + event.detail.dy;
+
+		// Update spring coordinates for smooth movement
 		coords.set(
 			{
-				x: current.x + event.detail.dx,
-				y: current.y + event.detail.dy
+				x: newX,
+				y: newY
 			},
 			{ instant: true }
 		);
+
+		// Update window position in store for real-time stats updates
+		windowsStore.update((windows) => {
+			const index = windows.findIndex((window) => window.id === id);
+			if (index !== -1) {
+				windows[index].pos.x = newX;
+				windows[index].pos.y = newY;
+			}
+			return windows;
+		});
 	}
 
 	// Reset stiffness/damping for smooth animation and check for overflow
@@ -86,6 +100,36 @@
 	}
 
 	// --- Event Handler for Resizing ---
+
+	// Handler for the 'onresizing' custom event from the `resizable` action during resize
+	function handleResizing(event: { detail: { w: number; h: number; x: number; y: number } }) {
+		// Don't allow resizing if window is maximized
+		const currentWindow = $windowsStore.find((w) => w.id === id);
+		if (currentWindow?.isMaximized) return;
+
+		// Apply minimum size constraints
+		if (event.detail.w < offset * 2) {
+			event.detail.w = offset * 2;
+		}
+		if (event.detail.h < navHeight + offset * 2) {
+			event.detail.h = navHeight + offset * 2;
+		}
+
+		// Update the spring's position in real-time
+		coords.set({ x: event.detail.x, y: event.detail.y }, { instant: true });
+
+		// Update the window's dimensions and position in the global windows store in real-time
+		windowsStore.update((windows) => {
+			const index = windows.findIndex((window) => window.id === id);
+			if (index !== -1) {
+				windows[index].w = event.detail.w;
+				windows[index].h = event.detail.h;
+				windows[index].pos.x = event.detail.x;
+				windows[index].pos.y = event.detail.y;
+			}
+			return windows;
+		});
+	}
 
 	// Handler for the 'onresized' custom event from the `resizable` action
 	// Updates window dimensions and position in the store and checks for overflow
@@ -154,9 +198,36 @@
 		});
 	}
 
-	// Get the current window state from the store
-	const currentWindow = $derived($windowsStore.find((w) => w.id === id));
-	const isMaximized = $derived(currentWindow?.isMaximized || false);
+	// Riferimento al DOM element per gestire manualmente i grabber
+	let windowElement: HTMLElement;
+
+	// Tracciamo manualmente isMaximized per garantire l'aggiornamento dell'UI
+	let isMaximizedState = $state(false);
+
+	// Funzione che aggiorna manualmente lo stato e i grabber
+	function updateMaximizedState() {
+		const win = $windowsStore.find((w) => w.id === id);
+		const newState = win?.isMaximized || false;
+
+		// Aggiorna lo stato solo se è cambiato
+		if (isMaximizedState !== newState) {
+			isMaximizedState = newState;
+
+			// Aggiorna manualmente i grabber se l'elemento è disponibile
+			if (windowElement) {
+				const grabbers = windowElement.querySelectorAll('.grabber');
+				grabbers.forEach((grabber) => {
+					grabber.classList.toggle('disabled', isMaximizedState);
+					(grabber as HTMLElement).style.display = isMaximizedState ? 'none' : 'block';
+				});
+			}
+		}
+	}
+
+	// Monitora i cambiamenti nello store e aggiorna lo stato locale
+	$effect(() => {
+		updateMaximizedState();
+	});
 </script>
 
 <!-- Bind viewport dimensions to state variables -->
@@ -166,12 +237,14 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
 	class="box"
-	class:maximized={isMaximized}
-	use:resizable={{ disabled: isMaximized }}
+	class:maximized={isMaximizedState}
+	use:resizable={{ disabled: isMaximizedState }}
+	onresizing={handleResizing}
 	onresized={handleResized}
 	in:fade={{ duration: 30 }}
 	out:fade={{ duration: 30 }}
 	onfocus={toFront}
+	bind:this={windowElement}
 	{id}
 	tabindex="0"
 	style="
@@ -198,13 +271,52 @@
 			<!-- Window controls -->
 			<div class="window-controls">
 				<button class="control-btn minimize" onclick={handleMinimize} aria-label="Minimize">
-					<span class="icon">_</span>
+					<span class="control-icon">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="18"
+							height="18"
+							viewBox="0 0 24 24"
+							style="fill: rgba(0, 0, 0, 1);"><path d="M5 11h14v2H5z"></path></svg
+						>
+					</span>
 				</button>
 				<button class="control-btn maximize" onclick={handleMaximize} aria-label="Maximize">
-					<span class="icon">{isMaximized ? '↓' : '↑'}</span>
+					<span class="control-icon">
+						{#if isMaximizedState}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								style="fill: rgba(0, 0, 0, 1);"
+								><path d="M2 15h7v7h2v-9H2v2zM15 2h-2v9h9V9h-7V2z"></path></svg
+							>
+						{:else}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								style="fill: rgba(0, 0, 0, 1);"
+								><path d="M5 12H3v9h9v-2H5zm7-7h7v7h2V3h-9z"></path></svg
+							>
+						{/if}
+					</span>
 				</button>
 				<button class="control-btn close" onclick={handleClose} aria-label="Close">
-					<span class="icon">×</span>
+					<span class="control-icon">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="18"
+							height="18"
+							viewBox="0 0 24 24"
+							style="fill: rgba(0, 0, 0, 1);"
+							><path
+								d="m16.192 6.344-4.243 4.242-4.242-4.242-1.414 1.414L10.535 12l-4.242 4.242 1.414 1.414 4.242-4.242 4.243 4.242 1.414-1.414L13.364 12l4.242-4.242z"
+							></path></svg
+						>
+					</span>
 				</button>
 			</div>
 		</div>
@@ -222,6 +334,11 @@
 	:global(.grabber) {
 		position: absolute;
 		box-sizing: border-box;
+	}
+
+	/* Hide grabbers when they're disabled */
+	:global(.grabber.disabled) {
+		display: none !important;
 	}
 
 	/* Styles for specific grabber directions */
@@ -309,11 +426,6 @@
 		outline: none;
 	}
 
-	/* Styles for maximized windows */
-	.maximized {
-		border-radius: 0;
-	}
-
 	/* Styles for the inner container */
 	.container {
 		position: absolute;
@@ -332,11 +444,6 @@
 		position: relative;
 		justify-content: space-between;
 		background-color: #f5f5f5;
-	}
-
-	/* Remove border radius when maximized */
-	.maximized .head {
-		border-radius: 0px;
 	}
 
 	/* Cursor style when actively dragging the header */
@@ -374,7 +481,7 @@
 	.control-btn {
 		width: 24px;
 		height: 24px;
-		margin-left: 8px;
+		margin-left: 6px;
 		border: none;
 		border-radius: 3px;
 		display: flex;
@@ -389,25 +496,12 @@
 	}
 
 	/* Specific styles for each button type */
-	.minimize {
-		font-size: 14px;
-	}
-
-	.maximize {
-		font-size: 14px;
-	}
-
-	.close {
-		font-size: 18px;
-	}
-
 	.close:hover {
 		background-color: #ff6b6b;
 		color: white;
 	}
 
-	/* Icon styling */
-	.icon {
-		line-height: 1;
+	.control-icon svg {
+		margin-bottom: -2px;
 	}
 </style>

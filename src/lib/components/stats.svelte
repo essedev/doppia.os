@@ -1,8 +1,27 @@
 <script lang="ts">
+	import type { WindowData } from '$lib/stores/windows';
 	import { windowsStore } from '$lib/stores/windows';
 
-	let selectedWindowId: string = '';
-	$: selectedWindow = $windowsStore.find((w) => w.id === selectedWindowId);
+	let selectedWindowId = $state('');
+	let selectedWindow = $state<WindowData | undefined>(undefined);
+
+	// Update the selected window when selectedWindowId changes
+	$effect(() => {
+		selectedWindow = $windowsStore.find((w) => w.id === selectedWindowId);
+	});
+
+	// Auto-select the window with the highest z-index (last interacted with)
+	$effect(() => {
+		const activeWindows = $windowsStore.filter((w) => w.active);
+		if (activeWindows.length > 0) {
+			// Find the window with the highest z-index
+			const topWindow = activeWindows.reduce(
+				(highest, current) => (current.pos.z > highest.pos.z ? current : highest),
+				activeWindows[0]
+			);
+			selectedWindowId = topWindow.id;
+		}
+	});
 </script>
 
 <div class="stats">
@@ -14,7 +33,7 @@
 		{/each}
 	</select>
 
-	{#if selectedWindow?.active}
+	{#if selectedWindow && selectedWindow.active}
 		<span>WIDTH: {selectedWindow.w}px</span>
 		<span>HEIGHT: {selectedWindow.h}px</span>
 		<span>X: {selectedWindow.pos.x}px</span>
