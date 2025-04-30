@@ -210,7 +210,9 @@
 
 		// Check if the window is dragged near snap zones
 		if (event.detail.x !== undefined && event.detail.y !== undefined) {
-			const currentSnapType = detectSnapZone(newX, newY, width, height);
+			const cursorX = event.detail.x;
+			const cursorY = event.detail.y;
+			const currentSnapType = detectSnapZone(cursorX, cursorY, width, height);
 
 			// Update the snap zone state
 			isDraggingNearSnapZone = currentSnapType !== SnapType.NONE;

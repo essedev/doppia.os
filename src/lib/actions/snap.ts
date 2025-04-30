@@ -3,7 +3,7 @@ import type { Spring } from 'svelte/motion';
 import type { Writable } from 'svelte/store';
 
 // Constants for snap zones
-export const SNAP_THRESHOLD = 20;
+export const SNAP_THRESHOLD = 30;
 
 // Snap types for different snap positions
 export enum SnapType {
@@ -40,68 +40,53 @@ export function snap(
 	// Store the current snap type for this window
 	let currentSnapType: SnapType = SnapType.NONE;
 
-	// Detect if window is being dragged near a snap zone
+	// Detect if window is being dragged near a snap zone based on CURSOR position
 	function detectSnapZone(
-		x: number,
-		y: number,
+		cursorX: number,
+		cursorY: number,
 		viewportWidth: number,
 		viewportHeight: number
 	): SnapType {
 		// Calculate edges of the viewport with offset
 		const rightEdge = viewportWidth - offset;
-		const topEdge = navHeight + offset;
+		const topEdge = navHeight + offset; // Consideriamo il bordo superiore della zona utilizzabile
 		const bottomEdge = viewportHeight - offset;
+		const leftEdge = offset; // Bordo sinistro
 
-		// Get the current window's dimensions
-		let windowWidth = 0;
-		let windowHeight = 0;
-
-		const unsubscribe = windowsStore.subscribe((windows) => {
-			const window = windows.find((w) => w.id === id);
-			if (window) {
-				windowWidth = window.w;
-				windowHeight = window.h;
-			}
-		});
-		unsubscribe();
-
-		// Check corners first (they have priority)
+		// Check corners first (they have priority) using cursor position
 		// Top-left corner
-		if (x <= SNAP_THRESHOLD && y <= topEdge + SNAP_THRESHOLD) {
+		if (cursorX <= leftEdge + SNAP_THRESHOLD && cursorY <= topEdge + SNAP_THRESHOLD) {
 			return SnapType.TOP_LEFT;
 		}
 
 		// Top-right corner
-		if (x + windowWidth >= rightEdge - SNAP_THRESHOLD && y <= topEdge + SNAP_THRESHOLD) {
+		if (cursorX >= rightEdge - SNAP_THRESHOLD && cursorY <= topEdge + SNAP_THRESHOLD) {
 			return SnapType.TOP_RIGHT;
 		}
 
 		// Bottom-left corner
-		if (x <= SNAP_THRESHOLD && y + windowHeight >= bottomEdge - SNAP_THRESHOLD) {
+		if (cursorX <= leftEdge + SNAP_THRESHOLD && cursorY >= bottomEdge - SNAP_THRESHOLD) {
 			return SnapType.BOTTOM_LEFT;
 		}
 
 		// Bottom-right corner
-		if (
-			x + windowWidth >= rightEdge - SNAP_THRESHOLD &&
-			y + windowHeight >= bottomEdge - SNAP_THRESHOLD
-		) {
+		if (cursorX >= rightEdge - SNAP_THRESHOLD && cursorY >= bottomEdge - SNAP_THRESHOLD) {
 			return SnapType.BOTTOM_RIGHT;
 		}
 
-		// Then check edges
-		// Top edge (full screen)
-		if (y <= topEdge) {
+		// Then check edges using cursor position
+		// Top edge (full screen) - Attivato solo se il cursore è molto vicino al bordo superiore
+		if (cursorY <= topEdge) {
 			return SnapType.TOP;
 		}
 
 		// Left edge
-		if (x <= SNAP_THRESHOLD) {
+		if (cursorX <= leftEdge + SNAP_THRESHOLD) {
 			return SnapType.LEFT;
 		}
 
 		// Right edge
-		if (x + windowWidth >= rightEdge - SNAP_THRESHOLD) {
+		if (cursorX >= rightEdge - SNAP_THRESHOLD) {
 			return SnapType.RIGHT;
 		}
 
