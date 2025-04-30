@@ -3,8 +3,8 @@ import type { Spring } from 'svelte/motion';
 import type { Writable } from 'svelte/store';
 import { SnapType } from './snap';
 
-// WindowManager action: provides methods to enforce window bounds and manage z-index stacking
-export function windowManager(
+// Manager action: provides methods to enforce window bounds and manage z-index stacking
+export function manager(
 	coords: Spring<{ x: number; y: number }>,
 	id: string,
 	windowsStore: Writable<WindowData[]>,
@@ -146,21 +146,26 @@ export function windowManager(
 					currentWindow.pos.x = currentWindow.previousSize.pos.x;
 					currentWindow.pos.y = currentWindow.previousSize.pos.y;
 
+					// Reset previousSize since we're returning to normal state
 					currentWindow.previousSize = undefined;
 				}
+
 				currentWindow.isMaximized = false;
 				// Also reset the snap type
 				currentWindow.snapType = SnapType.NONE;
 			} else {
 				// Save current size and position before maximizing
-				currentWindow.previousSize = {
-					w: currentWindow.w,
-					h: currentWindow.h,
-					pos: {
-						x: currentWindow.pos.x,
-						y: currentWindow.pos.y
-					}
-				};
+				// Only save if we don't already have a previousSize (could be from snap operation)
+				if (!currentWindow.previousSize) {
+					currentWindow.previousSize = {
+						w: currentWindow.w,
+						h: currentWindow.h,
+						pos: {
+							x: currentWindow.pos.x,
+							y: currentWindow.pos.y
+						}
+					};
+				}
 
 				// Calculate maximum size considering offsets
 				const maxWidth = viewportWidth - offset * 2;
@@ -174,7 +179,7 @@ export function windowManager(
 				const newX = offset;
 				const newY = navHeight + offset;
 
-				coords.set({ x: newX, y: newY });
+				coords.set({ x: newX, y: newY }, { instant: true });
 				currentWindow.pos.x = newX;
 				currentWindow.pos.y = newY;
 

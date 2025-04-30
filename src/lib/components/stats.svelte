@@ -37,6 +37,25 @@
 			<div><span class="label">X:</span> <span>{selectedWindow.pos.x.toFixed(0)}px</span></div>
 			<div><span class="label">Y:</span> <span>{selectedWindow.pos.y.toFixed(0)}px</span></div>
 			<div><span class="label">Z:</span> <span>{selectedWindow.pos.z.toFixed(0)}</span></div>
+			<div>
+				<span class="label">SNAP TYPE:</span> <span>{selectedWindow.snapType || 'none'}</span>
+			</div>
+			<div>
+				<span class="label">PREV. SIZE:</span>
+				<span
+					>{selectedWindow.previousSize?.w.toFixed(0) || '0'}px, {selectedWindow.previousSize?.h.toFixed(
+						0
+					) || '0'}px</span
+				>
+			</div>
+			<div>
+				<span class="label">PREV. POSITION:</span>
+				<span
+					>{selectedWindow.previousSize?.pos.x.toFixed(0) || '0'}px, {selectedWindow.previousSize?.pos.y.toFixed(
+						0
+					) || '0'}px</span
+				>
+			</div>
 		</div>
 	{/if}
 </div>
@@ -55,6 +74,7 @@
 		flex-direction: column;
 		min-width: 220px;
 		backdrop-filter: blur(2px);
+		z-index: 1000;
 	}
 
 	.title {

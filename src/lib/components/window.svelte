@@ -1,9 +1,9 @@
 <!-- Window component: draggable, resizable window with smooth animations, dynamic stacking (z-index), and overflow management -->
 <script lang="ts">
-	import { windowManager } from '$lib/actions/manager';
+	import { manager } from '$lib/actions/manager';
 	import { pannable } from '$lib/actions/pannable';
 	import { resizable } from '$lib/actions/resizable';
-	import { SnapType, windowSnap } from '$lib/actions/snap';
+	import { SnapType, snap } from '$lib/actions/snap';
 	import { windowsStore } from '$lib/stores/windows';
 	import type { Component } from 'svelte';
 	import { onDestroy, onMount } from 'svelte';
@@ -50,20 +50,24 @@
 		}
 	);
 
-	// Initialize the windowManager action which handles z-index and overflow
-	const { checkOverflow, toFront, minimizeWindow, restoreFromMinimized, toggleMaximize } =
-		windowManager(coords, id, windowsStore, offset, navHeight);
+	// Initialize the manager action which handles z-index and overflow
+	const { checkOverflow, toFront, minimizeWindow, toggleMaximize } = manager(
+		coords,
+		id,
+		windowsStore,
+		offset,
+		navHeight
+	);
 
-	// Initialize the windowSnap action which handles window snapping
+	// Initialize the snap action which handles window snapping
 	const {
 		detectSnapZone,
 		createSnapPreview,
 		removeSnapPreviews,
 		applySnap,
 		isSnapped,
-		getSnapType,
 		restoreFromSnap
-	} = windowSnap(coords, id, windowsStore, offset, navHeight);
+	} = snap(coords, id, windowsStore, offset, navHeight);
 
 	// Effect to check and correct window overflow when viewport dimensions change
 	// A small delay allows the window element to potentially resize first
@@ -87,17 +91,25 @@
 
 	// --- Event Handlers for Panning (Dragging) ---
 
+	let tempSize = { w: 0, h: 0, pos: { x: 0, y: 0 } };
+
 	// Increase stiffness/damping for more responsive dragging
 	function handlePanStart(event: { detail?: { x?: number; y?: number } } = {}) {
 		coords.stiffness = 1;
 		coords.damping = 1;
-		// Reset state at the start of dragging
 		removeSnapPreviews();
 
-		// Save the initial cursor position
 		const currentWindow = $windowsStore.find((w) => w.id === id);
 		wasMaximized = currentWindow?.isMaximized || false;
 		wasSnapped = currentWindow?.snapType !== undefined && currentWindow?.snapType !== SnapType.NONE;
+
+		if (currentWindow) {
+			tempSize = {
+				w: currentWindow.w,
+				h: currentWindow.h,
+				pos: { x: currentWindow.pos.x, y: currentWindow.pos.y }
+			};
+		}
 
 		// If the event contains position details (added by our pannable action)
 		if (event.detail?.x !== undefined && event.detail?.y !== undefined && currentWindow) {
@@ -106,14 +118,10 @@
 
 			// Calculate the relative cursor position in the title bar
 			if (wasMaximized || wasSnapped) {
-				// Get the exact measurements of the bar element
 				if (headElement && windowElement) {
 					const headRect = headElement.getBoundingClientRect();
-					// Calculate the relative position relative to the edge of the title bar
 					relativeHeadX = initialCursorX - headRect.left;
 					relativeHeadY = initialCursorY - headRect.top;
-
-					// Save the current width of the window (maximized)
 					windowElementWidth = windowElement.clientWidth;
 				}
 			}
@@ -122,7 +130,6 @@
 
 	// Update the spring's target position instantly based on the drag delta
 	function handlePanMove(event: { detail: { dx: number; dy: number; x?: number; y?: number } }) {
-		// If the window was maximized, restore it to the previous size
 		const currentWindow = $windowsStore.find((w) => w.id === id);
 
 		// Handle restoring from maximized or snapped state
@@ -166,9 +173,6 @@
 						}
 						return windows;
 					});
-
-					// Add an overflow check to ensure the window remains visible
-					checkOverflow(width, height, true);
 				}
 			}, 10); // Slightly increased to ensure rendering is complete
 
@@ -237,7 +241,7 @@
 
 		// If there is an active preview window, apply the snap
 		if (previewWindowId && detectedSnapType) {
-			applySnap(detectedSnapType, width, height);
+			applySnap(detectedSnapType, width, height, tempSize);
 			removeSnapPreviews();
 		} else {
 			// Normal overflow check
@@ -258,14 +262,6 @@
 		const currentWindow = $windowsStore.find((w) => w.id === id);
 		if (currentWindow?.isMaximized) return;
 
-		// Apply minimum size constraints
-		if (event.detail.w < offset * 2) {
-			event.detail.w = offset * 2;
-		}
-		if (event.detail.h < navHeight + offset * 2) {
-			event.detail.h = navHeight + offset * 2;
-		}
-
 		// Update the spring's position in real-time
 		coords.set({ x: event.detail.x, y: event.detail.y }, { instant: true });
 
@@ -273,14 +269,21 @@
 		windowsStore.update((windows) => {
 			const index = windows.findIndex((window) => window.id === id);
 			if (index !== -1) {
-				windows[index].w = event.detail.w;
-				windows[index].h = event.detail.h;
-				windows[index].pos.x = event.detail.x;
-				windows[index].pos.y = event.detail.y;
+				const window = windows[index];
+
+				// Keep track of previousSize if resizing a snapped window
+				const isSnapped = window.snapType && window.snapType !== SnapType.NONE;
+
+				// Update window properties
+				window.w = event.detail.w;
+				window.h = event.detail.h;
+				window.pos.x = event.detail.x;
+				window.pos.y = event.detail.y;
 
 				// If the window was previously snapped, reset its snap state
-				if (windows[index].snapType && windows[index].snapType !== SnapType.NONE) {
-					windows[index].snapType = SnapType.NONE;
+				// but keep the previousSize intact
+				if (isSnapped) {
+					window.snapType = SnapType.NONE;
 				}
 			}
 			return windows;
@@ -293,14 +296,6 @@
 		// Don't allow resizing if window is maximized
 		const currentWindow = $windowsStore.find((w) => w.id === id);
 		if (currentWindow?.isMaximized) return;
-
-		// Apply minimum size constraints
-		if (event.detail.w < offset * 2) {
-			event.detail.w = offset * 2;
-		}
-		if (event.detail.h < navHeight + offset * 2) {
-			event.detail.h = navHeight + offset * 2;
-		}
 
 		// Instantly set the spring's position to the new position
 		coords.set({ x: event.detail.x, y: event.detail.y }, { instant: true });
@@ -327,9 +322,11 @@
 	function handleMaximize() {
 		// If the window is snapped (but not maximized), restore it first
 		const currentWindow = $windowsStore.find((w) => w.id === id);
+
 		if (
 			currentWindow?.snapType &&
 			currentWindow.snapType !== SnapType.NONE &&
+			currentWindow.snapType !== SnapType.TOP && // Do not restore if already fullscreen
 			!currentWindow.isMaximized
 		) {
 			restoreFromSnap();
@@ -593,6 +590,7 @@
 		border-radius: 100%;
 	}
 
+	/* Styles for corner grabbers (larger hit area, circular) */
 	:global(.grabber.bottom-right) {
 		height: 20px;
 		width: 20px;

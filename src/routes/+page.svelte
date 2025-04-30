@@ -1,4 +1,3 @@
-<!-- Main page component for doppia.os: handles loading screen, navbar, stats, and dynamic windows -->
 <script lang="ts">
 	import { PUBLIC_NODE_ENV } from '$env/static/public';
 	import Forkme from '$lib/components/forkme.svelte';
@@ -28,6 +27,7 @@
 	});
 </script>
 
+<!-- Main page component for doppia.os: handles loading screen, navbar, stats, and dynamic windows -->
 <svelte:head>
 	<title>doppia.os</title>
 </svelte:head>

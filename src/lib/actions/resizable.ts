@@ -1,6 +1,10 @@
 // Resizable action: adds resize handles (grabbers) to an element, enabling it to be resized by dragging its edges and corners
 
 export function resizable(element: HTMLElement, options: { disabled?: boolean } = {}) {
+	// Constant minimum dimensions
+	const MIN_WIDTH = 300;
+	const MIN_HEIGHT = 200;
+
 	const right = document.createElement('div');
 	right.dataset.direction = 'east';
 	right.classList.add('grabber');
@@ -54,7 +58,7 @@ export function resizable(element: HTMLElement, options: { disabled?: boolean } 
 		} | null = null,
 		initialPos: { x: any; y: any } | null = null;
 
-	// Variabile reattiva locale per tenere traccia dello stato disabled
+	// Local reactive variable to track disabled state
 	let isDisabled = !!options.disabled;
 
 	// Create and append resize grabbers for all eight directions
@@ -129,60 +133,85 @@ export function resizable(element: HTMLElement, options: { disabled?: boolean } 
 	// Handle mouse move: update element size and position according to drag direction
 	function onMove(event: MouseEvent) {
 		// Return immediately if no active grabber or if resizing is disabled
-		if (!active || isDisabled) return;
+		if (!active || isDisabled || !initialRect || !initialPos) return;
 
 		const direction = active.dataset.direction;
-		let delta;
 		let hasChanged = false;
-		let newWidth, newHeight, newLeft, newTop;
 
-		newLeft = parseInt(element.style.left, 10) || initialRect?.left || 0;
-		newTop = parseInt(element.style.top, 10) || initialRect?.top || 0;
-		newWidth = parseInt(element.style.width, 10) || initialRect?.width || 0;
-		newHeight = parseInt(element.style.height, 10) || initialRect?.height || 0;
+		// Initialize dimensions and position from the element or initial values
+		let newWidth = parseInt(element.style.width, 10) || initialRect.width || 0;
+		let newHeight = parseInt(element.style.height, 10) || initialRect.height || 0;
+		let newLeft = parseInt(element.style.left, 10) || initialRect.left || 0;
+		let newTop = parseInt(element.style.top, 10) || initialRect.top || 0;
 
+		// Calculate deltas for each direction
+		const deltaX = event.pageX - initialPos.x;
+		const deltaY = event.pageY - initialPos.y;
+
+		let widthChanged = false;
+		let heightChanged = false;
+
+		// Handle horizontal resizing (east/right)
 		if (direction?.match('east')) {
-			delta = event.pageX - initialPos?.x;
-			newWidth = initialRect?.width + delta;
-			if (newWidth >= 300) {
-				element.style.width = `${newWidth}px`;
+			const proposedWidth = initialRect.width + deltaX;
+			if (proposedWidth >= MIN_WIDTH) {
+				newWidth = proposedWidth;
+				widthChanged = true;
 				hasChanged = true;
 			}
 		}
 
+		// Handle horizontal resizing (west/left)
 		if (direction?.match('west')) {
-			delta = initialPos?.x - event.pageX;
-			newWidth = initialRect?.width + delta;
-			if (newWidth >= 300) {
-				newLeft = initialRect?.left - delta;
-				element.style.left = `${newLeft}px`;
-				element.style.width = `${newWidth}px`;
+			const proposedWidth = initialRect.width - deltaX;
+			if (proposedWidth >= MIN_WIDTH) {
+				newWidth = proposedWidth;
+				newLeft = initialRect.left + deltaX;
+				widthChanged = true;
 				hasChanged = true;
 			}
 		}
 
+		// Handle vertical resizing (north/top)
 		if (direction?.match('north')) {
-			delta = initialPos?.y - event.pageY;
-			newHeight = initialRect?.height + delta;
-			if (newHeight >= 200) {
-				newTop = initialRect?.top - delta;
-				element.style.top = `${newTop}px`;
-				element.style.height = `${newHeight}px`;
+			const proposedHeight = initialRect.height - deltaY;
+			if (proposedHeight >= MIN_HEIGHT) {
+				newHeight = proposedHeight;
+				newTop = initialRect.top + deltaY;
+				heightChanged = true;
 				hasChanged = true;
 			}
 		}
 
+		// Handle vertical resizing (south/bottom)
 		if (direction?.match('south')) {
-			delta = event.pageY - initialPos?.y;
-			newHeight = initialRect?.height + delta;
-			if (newHeight >= 200) {
-				element.style.height = `${newHeight}px`;
+			const proposedHeight = initialRect.height + deltaY;
+			if (proposedHeight >= MIN_HEIGHT) {
+				newHeight = proposedHeight;
+				heightChanged = true;
 				hasChanged = true;
 			}
 		}
 
-		// If dimensions changed, dispatch real-time resizing event
+		// Apply changes only if dimensions have changed and respect minimum limits
 		if (hasChanged) {
+			// Apply width changes
+			if (widthChanged) {
+				element.style.width = `${newWidth}px`;
+				if (direction?.match('west')) {
+					element.style.left = `${newLeft}px`;
+				}
+			}
+
+			// Apply height changes
+			if (heightChanged) {
+				element.style.height = `${newHeight}px`;
+				if (direction?.match('north')) {
+					element.style.top = `${newTop}px`;
+				}
+			}
+
+			// Dispatch resizing event
 			element.dispatchEvent(
 				new CustomEvent('resizing', {
 					detail: {
@@ -204,10 +233,10 @@ export function resizable(element: HTMLElement, options: { disabled?: boolean } 
 			const wasDisabled = isDisabled;
 			const nowDisabled = !!newOptions.disabled;
 
-			// Aggiorniamo la variabile delle opzioni
+			// Update options variable
 			options = newOptions;
 
-			// Se lo stato è cambiato, aggiorniamo i grabber
+			// If state has changed, update grabbers
 			if (wasDisabled !== nowDisabled) {
 				updateGrabbers(nowDisabled);
 

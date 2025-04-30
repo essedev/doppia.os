@@ -29,8 +29,8 @@ export interface SnapPreview {
 	};
 }
 
-// WindowSnap action: manages window snapping to screen edges and corners
-export function windowSnap(
+// Snap action: manages window snapping to screen edges and corners
+export function snap(
 	coords: Spring<{ x: number; y: number }>,
 	id: string,
 	windowsStore: Writable<WindowData[]>,
@@ -48,7 +48,6 @@ export function windowSnap(
 		viewportHeight: number
 	): SnapType {
 		// Calculate edges of the viewport with offset
-		const leftEdge = offset;
 		const rightEdge = viewportWidth - offset;
 		const topEdge = navHeight + offset;
 		const bottomEdge = viewportHeight - offset;
@@ -270,7 +269,12 @@ export function windowSnap(
 	}
 
 	// Apply the selected snap to the actual window
-	function applySnap(snapType: SnapType, viewportWidth: number, viewportHeight: number) {
+	function applySnap(
+		snapType: SnapType,
+		viewportWidth: number,
+		viewportHeight: number,
+		tempSize: { w: number; h: number; pos: { x: number; y: number } }
+	) {
 		if (snapType === SnapType.NONE) return;
 
 		// Calculate dimensions for the snap type
@@ -283,16 +287,8 @@ export function windowSnap(
 
 			const currentWindow = windows[index];
 
-			// Save current size and position before snapping (if not already saved)
-			if (!currentWindow.previousSize && !currentWindow.isMaximized) {
-				currentWindow.previousSize = {
-					w: currentWindow.w,
-					h: currentWindow.h,
-					pos: {
-						x: currentWindow.pos.x,
-						y: currentWindow.pos.y
-					}
-				};
+			if (tempSize) {
+				currentWindow.previousSize = tempSize;
 			}
 
 			// Update window dimensions and position
@@ -302,6 +298,7 @@ export function windowSnap(
 			currentWindow.pos.y = dimensions.y;
 
 			// Only set isMaximized true if it's a TOP snap (full screen)
+			const wasMaximized = currentWindow.isMaximized;
 			currentWindow.isMaximized = snapType === SnapType.TOP;
 
 			// Store the current snap type
@@ -325,12 +322,34 @@ export function windowSnap(
 
 	// Check if window is currently snapped
 	function isSnapped(): boolean {
-		return currentSnapType !== SnapType.NONE;
+		let isWindowSnapped = false;
+
+		// Check in the store to be sure
+		const unsubscribe = windowsStore.subscribe((windows) => {
+			const window = windows.find((w) => w.id === id);
+			if (window) {
+				isWindowSnapped = window.snapType !== undefined && window.snapType !== SnapType.NONE;
+			}
+		});
+		unsubscribe();
+
+		return isWindowSnapped;
 	}
 
 	// Get the current snap type
 	function getSnapType(): SnapType {
-		return currentSnapType;
+		let snapType = SnapType.NONE;
+
+		// Get from the store to be accurate
+		const unsubscribe = windowsStore.subscribe((windows) => {
+			const window = windows.find((w) => w.id === id);
+			if (window && window.snapType) {
+				snapType = window.snapType;
+			}
+		});
+		unsubscribe();
+
+		return snapType;
 	}
 
 	// Restore window to pre-snap state
@@ -345,7 +364,10 @@ export function windowSnap(
 			if (currentWindow.previousSize) {
 				currentWindow.w = currentWindow.previousSize.w;
 				currentWindow.h = currentWindow.previousSize.h;
+				currentWindow.pos.x = currentWindow.previousSize.pos.x;
+				currentWindow.pos.y = currentWindow.previousSize.pos.y;
 
+				// Update the spring position
 				coords.set(
 					{
 						x: currentWindow.previousSize.pos.x,
@@ -354,9 +376,7 @@ export function windowSnap(
 					{ instant: true }
 				);
 
-				currentWindow.pos.x = currentWindow.previousSize.pos.x;
-				currentWindow.pos.y = currentWindow.previousSize.pos.y;
-
+				// Reset previousSize only when actually restoring to normal state
 				currentWindow.previousSize = undefined;
 			}
 
