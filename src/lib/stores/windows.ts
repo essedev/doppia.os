@@ -1,5 +1,7 @@
+import { SnapType } from '$lib/actions/snap';
 import about from '$lib/components/windows/about.svelte';
 import contact from '$lib/components/windows/contact.svelte';
+import photopea from '$lib/components/windows/photopea.svelte';
 import projects from '$lib/components/windows/projects.svelte';
 import wip from '$lib/components/windows/wip.svelte';
 import type { Component } from 'svelte';
@@ -17,6 +19,7 @@ export type WindowData = {
 	isMaximized: boolean;
 	isPreview?: boolean;
 	previewFor?: string;
+	snapType?: SnapType;
 	previousSize?: { w: number; h: number; pos: { x: number; y: number } };
 };
 
@@ -58,6 +61,17 @@ const windows: WindowData[] = [
 		id: 'contact',
 		name: 'Contact',
 		content: contact,
+		w: 650,
+		h: 400,
+		pos: { x: 20, y: 70, z: 10 },
+		active: false,
+		isMinimized: false,
+		isMaximized: false
+	},
+	{
+		id: 'photopea',
+		name: 'Photopea',
+		content: photopea,
 		w: 650,
 		h: 400,
 		pos: { x: 20, y: 70, z: 10 },

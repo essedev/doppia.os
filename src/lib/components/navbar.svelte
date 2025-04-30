@@ -118,6 +118,16 @@
 	</button>
 
 	<button
+		id="photopea"
+		class="link-btn"
+		class:active={isWindowActive('photopea')}
+		class:minimized={isWindowMinimized('photopea')}
+		on:click={() => handleWindowButton('photopea')}
+	>
+		Photopea
+	</button>
+
+	<button
 		id="contact"
 		class="link-btn"
 		class:active={isWindowActive('contact')}

@@ -1,6 +1,7 @@
 import type { WindowData } from '$lib/stores/windows';
 import type { Spring } from 'svelte/motion';
 import type { Writable } from 'svelte/store';
+import { SnapType } from './snap';
 
 // WindowManager action: provides methods to enforce window bounds and manage z-index stacking
 export function windowManager(
@@ -25,6 +26,11 @@ export function windowManager(
 
 		// If window data is undefined or missing dimensions, exit early
 		if (!window || typeof window.w === 'undefined' || typeof window.h === 'undefined') {
+			return;
+		}
+
+		// Don't check overflow for snapped windows (they have fixed positions)
+		if (window.snapType && window.snapType !== SnapType.NONE) {
 			return;
 		}
 
@@ -143,6 +149,8 @@ export function windowManager(
 					currentWindow.previousSize = undefined;
 				}
 				currentWindow.isMaximized = false;
+				// Also reset the snap type
+				currentWindow.snapType = SnapType.NONE;
 			} else {
 				// Save current size and position before maximizing
 				currentWindow.previousSize = {
@@ -171,6 +179,8 @@ export function windowManager(
 				currentWindow.pos.y = newY;
 
 				currentWindow.isMaximized = true;
+				// Set the snap type to "top" for full screen
+				currentWindow.snapType = SnapType.TOP;
 			}
 
 			return windows;
